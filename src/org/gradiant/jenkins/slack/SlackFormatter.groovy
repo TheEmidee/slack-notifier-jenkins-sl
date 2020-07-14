@@ -9,9 +9,9 @@ String format(String title = '', String message = '', String testSummary = '') {
     def buildNumber = helper.getBuildNumber()
     def url = helper.getAbsoluteUrl()
 
-    def result = "${project}"
+    def result = "*${project}*"
 
-    if (branchName != null) result = "${result} >> ${branchName}"
+    if (branchName != null) result = "${result} >> `${branchName}`"
 
     result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>)"
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
