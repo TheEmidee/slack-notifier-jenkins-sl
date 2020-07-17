@@ -12,3 +12,7 @@ String green() {
 String yellow() {
   return '#DAA038'
 }
+
+String blue() {
+  return '#36A6E8'
+}
