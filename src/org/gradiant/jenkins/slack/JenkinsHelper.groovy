@@ -2,8 +2,21 @@ package org.gradiant.jenkins.slack
 
 
 String getBranchName() {
-    if (env.BRANCH_NAME != null) return env.BRANCH_NAME
-    return env.GIT_BRANCH
+    String result = ""
+
+    if ( env.PULL_REQUEST_TITLE != null ) {
+        result = env.PULL_REQUEST_TITLE
+    }
+
+    if (env.BRANCH_NAME != null) {
+        result += " " + env.BRANCH_NAME
+    }
+
+    if ( result == "" ) {
+        result = env.GIT_BRANCH
+    }
+    
+    return result
 }
 
 boolean isMultibranch() {
