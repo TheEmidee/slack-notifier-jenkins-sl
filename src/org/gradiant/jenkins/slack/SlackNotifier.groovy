@@ -1,5 +1,15 @@
 package org.gradiant.jenkins.slack
 
+void notifyMessage( message ) {
+  SlackFormatter formatter = new SlackFormatter()
+  SlackSender sender = new SlackSender()
+  JenkinsStatus status = new JenkinsStatus()
+
+  def message = formatter.format message
+  def colors = new Color()
+  
+  sender.send message, colors.blue()
+}
 
 void notifyStart() {
   SlackFormatter formatter = new SlackFormatter()
