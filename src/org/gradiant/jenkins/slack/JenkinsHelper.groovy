@@ -5,11 +5,11 @@ String getBranchName() {
     String result = ""
 
     if ( env.PULL_REQUEST_TITLE != null ) {
-        result = env.PULL_REQUEST_TITLE
+        result = env.PULL_REQUEST_TITLE + " | "
     }
 
     if (env.BRANCH_NAME != null) {
-        result += " " + env.BRANCH_NAME
+        result += env.BRANCH_NAME
     }
 
     if ( result == "" ) {
