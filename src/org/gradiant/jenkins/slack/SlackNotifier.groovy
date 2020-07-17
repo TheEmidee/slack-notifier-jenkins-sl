@@ -1,11 +1,11 @@
 package org.gradiant.jenkins.slack
 
-void notifyMessage( message ) {
+void notifyMessage( custom_message ) {
   SlackFormatter formatter = new SlackFormatter()
   SlackSender sender = new SlackSender()
   JenkinsStatus status = new JenkinsStatus()
 
-  def message = formatter.format message
+  def message = formatter.format custom_message
   def colors = new Color()
   
   sender.send message, colors.blue()
