@@ -28,7 +28,7 @@ void notifyError(Throwable err) {
   def sender = new SlackSender()
   def color = new Color().red()
 
-  def message = formatter.format "An error occurred :interrobang:", err.message
+  def message = formatter.format "An error occurred :interrobang: ${err}"
   sender.send message, color
 }
 
