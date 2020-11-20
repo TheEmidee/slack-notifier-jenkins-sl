@@ -28,10 +28,10 @@ void notifyError(Throwable err) {
   def sender = new SlackSender()
   def color = new Color().red()
 
-  def message = formatter.format "An error occurred :interrobang:"
+  def message = formatter.format ":interrobang: An error occurred "
 
   if ( env.CURRENT_STEP != null ) {
-    message += " Current step : ${env.CURRENT_STEP}"
+    message += " while executing ${env.CURRENT_STEP}"
   }
 
   message += " ${err}"
