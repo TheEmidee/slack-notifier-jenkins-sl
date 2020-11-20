@@ -30,7 +30,7 @@ void notifyError(Throwable err) {
 
   def message = formatter.format "An error occurred :interrobang:"
 
-  if ( !env.CURRENT_STEP?.trim() ) {
+  if ( env.CURRENT_STEP != null ) {
     message += " Current step : ${env.CURRENT_STEP}"
   }
 
