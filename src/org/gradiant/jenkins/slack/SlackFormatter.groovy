@@ -10,6 +10,7 @@ String format(String title = '', String message = '', String testSummary = '') {
     def url = helper.getAbsoluteUrl()
 
     def result = "*${project}*"
+    result = result + " [ ${env.NODE_NAME} ] "
 
     if (branchName != null) result = "${result} >> `${branchName}`"
 
