@@ -33,6 +33,17 @@ String getAbsoluteUrl() {
     return currentBuild.absoluteUrl
 }
 
+String getConsoleLogsUrl() {
+    return getAbsoluteUrl() + "/consoleFull/"
+}
+
+String getTestsResultUrl() {
+    return getAbsoluteUrl() + "/testReport/"
+}
+
+String getArtifactsUrl() {
+    return getAbsoluteUrl() + "/artifact/"
+}
 
 String getProjectName() {
     if(isMultibranch()) return getMultiBranchProjectName()
