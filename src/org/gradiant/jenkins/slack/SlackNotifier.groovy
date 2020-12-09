@@ -1,17 +1,5 @@
 package org.gradiant.jenkins.slack
 
-String appendHelperUrlsToMessage( String message ) {
-  def logsUrl = helper.getConsoleLogsUrl()
-  def testsUrl = helper.getTestsResultUrl()
-  def artifactsUrl = helper.getArtifactsUrl()
-
-  message = message += "\n<${logsUrl}|ConsoleLog>"
-  message = message += "\n<${testsUrl}|Test Result>"
-  message = message += "\n<${artifactsUrl}|Artifacts>"
-
-  return message
-}
-
 void notifyMessage( custom_message ) {
   SlackFormatter formatter = new SlackFormatter()
   SlackSender sender = new SlackSender()
@@ -48,7 +36,6 @@ void notifyError(Throwable err) {
 
   message += " ${err}"
 
-  message = appendHelperUrlsToMessage( message )
   sender.send message, color
 }
 
@@ -83,9 +70,7 @@ void notifyResult() {
     testSummary = jenkinsTestsSummary.getTestSummary()
   }
 
-  def message = formatter.format "${statusMessage} after ${duration}", changes, testSummary
-
-  message = appendHelperUrlsToMessage( message )
+  def message = formatter.formatResult "${statusMessage} after ${duration}", changes, testSummary
 
   sender.send message, color
 }
