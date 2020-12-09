@@ -34,7 +34,7 @@ String getAbsoluteUrl() {
 }
 
 String getConsoleLogsUrl() {
-    return getAbsoluteUrl() + "console/"
+    return getAbsoluteUrl() + "consoleFull"
 }
 
 String getTestsResultUrl() {
