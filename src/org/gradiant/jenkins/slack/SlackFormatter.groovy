@@ -40,9 +40,9 @@ String formatResult(String title = '', String message = '', String testSummary =
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
     if (testSummary) result = result + "\n ${testSummary}"
 
-    result = result += "\n<${logsUrl}|ConsoleLog>"
-    result = result += "\n<${testsUrl}|Test Result>"
-    result = result += "\n<${artifactsUrl}|Artifacts>"
+    result = result + "\n<${logsUrl}|ConsoleLog>"
+    result = result + "\n<${testsUrl}|Test Result>"
+    result = result + "\n<${artifactsUrl}|Artifacts>"
 
     return result
 }
