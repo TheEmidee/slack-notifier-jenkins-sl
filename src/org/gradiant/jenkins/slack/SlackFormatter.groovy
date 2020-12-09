@@ -8,9 +8,6 @@ String format(String title = '', String message = '', String testSummary = '') {
     def branchName = helper.getBranchName()
     def buildNumber = helper.getBuildNumber()
     def url = helper.getAbsoluteUrl()
-    def logsUrl = helper.getConsoleLogsUrl()
-    def testsUrl = helper.getTestsResultUrl()
-    def artifactsUrl = helper.getArtifactsUrl()
 
     def result = "*${project}*"
 
@@ -19,10 +16,6 @@ String format(String title = '', String message = '', String testSummary = '') {
     result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>)"
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
     if (testSummary) result = result + "\n ${testSummary}"
-
-    result = result += "\n<${logsUrl}|ConsoleLog>"
-    result = result += "\n<${testsUrl}|Test Result>"
-    result = result += "\n<${artifactsUrl}|Artifacts>"
 
     return result
 }
