@@ -34,15 +34,15 @@ String getAbsoluteUrl() {
 }
 
 String getConsoleLogsUrl() {
-    return getAbsoluteUrl() + "/consoleFull/"
+    return getAbsoluteUrl() + "consoleFull/"
 }
 
 String getTestsResultUrl() {
-    return getAbsoluteUrl() + "/testReport/"
+    return getAbsoluteUrl() + "testReport/"
 }
 
 String getArtifactsUrl() {
-    return getAbsoluteUrl() + "/artifact/"
+    return getAbsoluteUrl() + "artifact/"
 }
 
 String getProjectName() {

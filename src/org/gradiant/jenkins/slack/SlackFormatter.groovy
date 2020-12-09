@@ -36,13 +36,9 @@ String formatResult(String title = '', String message = '', String testSummary =
 
     if (branchName != null) result = "${result} >> `${branchName}`"
 
-    result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>)"
+    result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>) - <${logsUrl}|ConsoleLog> - <${testsUrl}|Test Result> - <${artifactsUrl}|Artifacts>"
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
     if (testSummary) result = result + "\n ${testSummary}"
-
-    result = result + "\n<${logsUrl}|ConsoleLog>"
-    result = result + "\n<${testsUrl}|Test Result>"
-    result = result + "\n<${artifactsUrl}|Artifacts>"
 
     return result
 }
