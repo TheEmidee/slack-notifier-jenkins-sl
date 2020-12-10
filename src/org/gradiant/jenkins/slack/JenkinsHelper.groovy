@@ -1,15 +1,10 @@
 package org.gradiant.jenkins.slack
 
-
 String getBranchName() {
     String result = ""
 
-    if ( env.PULL_REQUEST_TITLE != null ) {
-        result = env.PULL_REQUEST_TITLE + " | "
-    }
-
     if (env.BRANCH_NAME != null) {
-        result += env.BRANCH_NAME
+        result = env.BRANCH_NAME
     }
 
     if ( result == "" ) {
@@ -19,15 +14,25 @@ String getBranchName() {
     return result
 }
 
+String getFullBranchName() {
+    String result = ""
+
+    if ( env.PULL_REQUEST_TITLE != null ) {
+        result = env.PULL_REQUEST_TITLE + " | "
+    }
+
+    result += getBranchName()
+
+    return result
+}
+
 boolean isMultibranch() {
     return getBranchName() != null
 }
 
-
 int getBuildNumber() {
     return currentBuild.number
 }
-
 
 String getAbsoluteUrl() {
     return currentBuild.absoluteUrl
@@ -43,6 +48,22 @@ String getTestsResultUrl() {
 
 String getArtifactsUrl() {
     return getAbsoluteUrl() + "artifact/"
+}
+
+String getGitHubPRNumber() {
+    def result = ""
+
+    def branch_name = getBranchName()
+
+    if (branch_name.startsWith( "PR-" ) ) {
+        result = branch_name.subString( 3 )
+    }
+
+    return result
+}
+
+String getGitHubPRUrl() {
+    return "https://github.com/FishingCactus/${getProjectName()}/pull/${getGitHubPRNumber()}"
 }
 
 String getProjectName() {
@@ -61,7 +82,6 @@ String getMultiBranchProjectName() {
     return entries.join('/')
 }
 
-
 List<String> getChanges() {
     List<String> messages = []
     for (int i = 0; i < currentBuild.changeSets.size(); i++) {
@@ -79,11 +99,9 @@ String getDuration() {
     return currentBuild.durationString.replace(' and counting', '')
 }
 
-
 String getCurrentStatus() {
     return currentBuild.currentResult
 }
-
 
 String getPreviousStatus() {
     def prev = currentBuild.previousBuild?.currentResult
