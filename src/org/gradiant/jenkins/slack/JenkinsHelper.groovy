@@ -54,9 +54,9 @@ String getLastBuildUrl() {
     def result = getAbsoluteUrl()
     def build_number_str = "${getBuildNumber()}/"
 
-    result = result.substring( result.length() - build_number_str.length() )
+    result = result.substring( 0, result.length() - build_number_str.length() )
 
-    result = result + "lastBuild"
+    result = result + "/lastBuild"
 
     return result
 }
