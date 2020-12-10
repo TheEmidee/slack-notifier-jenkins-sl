@@ -50,13 +50,30 @@ String getArtifactsUrl() {
     return getAbsoluteUrl() + "artifact/"
 }
 
+String getLastBuildUrl() {
+    def result = getAbsoluteUrl()
+    def build_number_str = "${getBuildNumber()}/"
+
+    result = result.substring( result.length() - build_number_str.length() )
+
+    result = result + "lastBuild"
+
+    return result
+}
+
+String getRebuildUrl() {
+    def result = getLastBuildUrl()
+
+    return "${result}rebuild"
+}
+
 String getGitHubPRNumber() {
     def result = ""
 
     def branch_name = getBranchName()
 
     if (branch_name.startsWith( "PR-" ) ) {
-        result = branch_name.subString( 3 )
+        result = branch_name.substring( 3 )
     }
 
     return result
