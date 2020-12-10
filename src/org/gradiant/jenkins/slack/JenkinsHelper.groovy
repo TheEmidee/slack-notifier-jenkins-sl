@@ -56,7 +56,7 @@ String getLastBuildUrl() {
 
     result = result.substring( 0, result.length() - build_number_str.length() )
 
-    result = result + "/lastBuild"
+    result = result + "lastBuild"
 
     return result
 }
@@ -64,7 +64,7 @@ String getLastBuildUrl() {
 String getRebuildUrl() {
     def result = getLastBuildUrl()
 
-    return "${result}rebuild"
+    return "${result}/rebuild"
 }
 
 String getGitHubPRNumber() {
