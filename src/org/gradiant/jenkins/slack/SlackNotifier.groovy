@@ -62,7 +62,10 @@ void notifyStage( slackResponse, String stage_name ) {
   def formatter = new SlackFormatter()
   def sender = new SlackSender()
 
-  env.SLACK_ALL_STAGES += "'* ${stage_name}\n"
+  if ( env.SLACK_ALL_STAGES != null && env.SLACK_ALL_STAGES != '' ) {
+    env.SLACK_ALL_STAGES += " :heavy_check_mark: \n"
+  }
+  env.SLACK_ALL_STAGES += "* ${stage_name}"
 
   def blocks = formatter.format env.SLACK_ALL_STAGES
   sender.updateMessage( slackResponse, blocks )

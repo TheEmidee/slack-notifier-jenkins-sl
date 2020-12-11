@@ -67,7 +67,7 @@ String formatResult( String content_extra_infos = '' ) {
 
     if (config.getTestSummary()) {
         JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
-        changes += jenkinsTestsSummary.getTestSummary()
+        changes += "\n\n" + jenkinsTestsSummary.getTestSummary()
     }
 
     def content = "${statusMessage} after ${duration}"
