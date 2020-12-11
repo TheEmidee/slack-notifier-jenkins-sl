@@ -17,7 +17,7 @@ void notifyStart() {
 
   def blocks = formatter.format 'Build started...'
 
-  return sender.send( blocks )
+  return sender.sendBlocks( blocks )
 }
 
 
@@ -33,7 +33,7 @@ void notifyError(Throwable err) {
 
   message += "\nError: `${err}`"
 
-  return sender.send message
+  return sender.sendMessage message
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
@@ -68,7 +68,7 @@ void notifyResult() {
 
   def message = formatter.formatResult "${statusMessage} after ${duration}", changes, testSummary
 
-  return sender.send message
+  return sender.sendMessage message
 }
 
 void notifyResultFull() {

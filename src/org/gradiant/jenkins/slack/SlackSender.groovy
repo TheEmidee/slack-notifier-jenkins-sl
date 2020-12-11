@@ -1,9 +1,14 @@
 package org.gradiant.jenkins.slack
 
 
-void send(blocks) {
+void sendBlocks(blocks) {
   return slackSend( channel: /*env.SLACK_CHANNEL*/ "test-jenkinscactus", teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks )
   //slackSend options
+}
+
+void sendMessage(String message) {
+  options = getOptions( message )
+  slackSend options
 }
 
 
