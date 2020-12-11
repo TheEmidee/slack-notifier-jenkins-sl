@@ -10,15 +10,80 @@ String format(String title = '') {
     def url = helper.getAbsoluteUrl()
     def nodeName = helper.getNodeName()
 
-    def result = "*${project}*\n"
+    blocks = 
+    [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": project,
+                "emoji": true
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Branch name : * ${branchName}"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Build Number : * #${buildNumber}"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Node name : * ${nodeName}"
+            }
+        },
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "plain_text",
+				"text": title,
+				"emoji": true
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Open",
+						"emoji": true
+					},
+					"value": "open_job_page",
+					"url": url,
+					"action_id": "open_job_page"
+				}
+			]
+		}
+    ]
 
-    if (branchName != null) result = "${result} [${branchName}] "
+    return blocks
 
-    result = result + "[#${buildNumber}] [${nodeName}]"
-    result = result + "\n(<${url}|Open>)"
-    result = result + "\n\n${title.trim()}"
+    // def result = "*${project}*\n"
 
-    return result
+    // if (branchName != null) result = "${result} [${branchName}] "
+
+    // result = result + "[#${buildNumber}] [${nodeName}]"
+    // result = result + "\n(<${url}|Open>)"
+    // result = result + "\n\n${title.trim()}"
+
+    // return result
 }
 
 String formatResult(String title = '', String message = '', String testSummary = '') {

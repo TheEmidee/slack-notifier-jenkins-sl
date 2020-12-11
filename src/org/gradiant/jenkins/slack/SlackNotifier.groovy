@@ -5,10 +5,10 @@ void notifyMessage( custom_message ) {
   SlackSender sender = new SlackSender()
   JenkinsStatus status = new JenkinsStatus()
 
-  def message = formatter.format custom_message
+  def blocks = formatter.format custom_message
   def colors = new Color()
   
-  sender.send message, colors.blue()
+  sender.send blocks, colors.blue()
 }
 
 void notifyStart() {
@@ -16,10 +16,10 @@ void notifyStart() {
   SlackSender sender = new SlackSender()
   JenkinsStatus status = new JenkinsStatus()
 
-  def message = formatter.format 'Build started...'
+  def blocks = formatter.format 'Build started...'
   def color = status.getStatusColor()
 
-  sender.send message, color
+  return sender.send blocks, color
 }
 
 
@@ -36,7 +36,7 @@ void notifyError(Throwable err) {
 
   message += "\nError: `${err}`"
 
-  sender.send message, color
+  return sender.send message, color
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
@@ -72,12 +72,12 @@ void notifyResult() {
 
   def message = formatter.formatResult "${statusMessage} after ${duration}", changes, testSummary
 
-  sender.send message, color
+  return sender.send message, color
 }
 
 void notifyResultFull() {
   env.TEST_SUMMARY = true
   env.CHANGE_LIST = true
   env.NOTIFY_SUCCESS = true
-  notifyResult()
+  return notifyResult()
 }
