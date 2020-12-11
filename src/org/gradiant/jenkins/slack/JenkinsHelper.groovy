@@ -133,7 +133,3 @@ String getPreviousStatus() {
 
     return prev
 }
-
-String getBuildDescription() {
-    return currentBuild.description
-}

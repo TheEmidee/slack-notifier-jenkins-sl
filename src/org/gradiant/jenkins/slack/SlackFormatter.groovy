@@ -12,13 +12,11 @@ String format(String title = '') {
 
     def result = "*${project}*\n"
 
-    result = result + "`"
-
     if (branchName != null) result = "${result} [${branchName}] "
 
-    result = result + "[#${buildNumber}] [${nodeName}]`"
+    result = result + "[#${buildNumber}] [${nodeName}]"
     result = result + "\n(<${url}|Open>)"
-    result = result + "\n${title.trim()}"
+    result = result + "\n\n${title.trim()}"
 
     return result
 }
@@ -31,15 +29,12 @@ String formatResult(String title = '', String message = '', String testSummary =
     def artifactsUrl = helper.getArtifactsUrl()
     def githubPRUrl = helper.getGitHubPRUrl()
     def rebuildUrl = helper.getRebuildUrl()
-    def description = helper.getBuildDescription()
 
     def result = format title
 
-    result = result + "\n(<${logsUrl}|ConsoleLog>) - (<${testsUrl}|Test Result>) - (<${artifactsUrl}|Artifacts>) - (<${githubPRUrl}|GitHub PR>) - (<${rebuildUrl}|Rebuild Job>)"
-    if (message) result = result + "\nChanges:\n\t ${message.trim()}"
+    result = result + "\n\n(<${logsUrl}|ConsoleLog>) - (<${testsUrl}|Test Result>) - (<${artifactsUrl}|Artifacts>) - (<${githubPRUrl}|GitHub PR>) - (<${rebuildUrl}|Rebuild Job>)"
+    if (message) result = result + "\n\nChanges:\n\t ${message.trim()}"
     if (testSummary) result = result + "\n ${testSummary}"
-
-    result = result + "\n\n *Description*:\n${description}"
 
     return result
 }
