@@ -8,10 +8,13 @@ String format(String title = '', String message = '', String testSummary = '') {
     def branchName = helper.getFullBranchName()
     def buildNumber = helper.getBuildNumber()
     def url = helper.getAbsoluteUrl()
+    def nodeName = helper.getNodeName()
 
     def result = "*${project}*"
 
     if (branchName != null) result = "${result} >> `${branchName}`"
+
+    result = result + " on [${nodeName}]"
 
     result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>)"
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
@@ -37,8 +40,11 @@ String formatResult(String title = '', String message = '', String testSummary =
     def result = "*${project}*"
 
     if (branchName != null) result = "${result} >> `${branchName}`"
+    
+    result = result + " on [${nodeName}]"
 
-    result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>) - (<${logsUrl}|ConsoleLog>) - (<${testsUrl}|Test Result>) - (<${artifactsUrl}|Artifacts>) - (<${githubPRUrl}|GitHub PR>) - (<${rebuildUrl}|Rebuild Job>)"
+    result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>)"
+    result = result + "\n(<${logsUrl}|ConsoleLog>) - (<${testsUrl}|Test Result>) - (<${artifactsUrl}|Artifacts>) - (<${githubPRUrl}|GitHub PR>) - (<${rebuildUrl}|Rebuild Job>)"
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
     if (testSummary) result = result + "\n ${testSummary}"
 

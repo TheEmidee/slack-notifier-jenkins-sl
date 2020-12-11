@@ -31,10 +31,10 @@ void notifyError(Throwable err) {
   def message = formatter.format ":interrobang: An error occurred "
 
   if ( env.CURRENT_STEP != null ) {
-    message += " while executing ${env.CURRENT_STEP}"
+    message += "\nwhile executing ${env.CURRENT_STEP}"
   }
 
-  message += " ${err}"
+  message += "\nError: `${err}`"
 
   sender.send message, color
 }
