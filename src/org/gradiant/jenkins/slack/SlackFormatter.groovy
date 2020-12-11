@@ -10,11 +10,14 @@ String format(String title = '') {
     def url = helper.getAbsoluteUrl()
     def nodeName = helper.getNodeName()
 
-    def result = "*${project}*"
+    def result = "*${project}*\n"
 
-    if (branchName != null) result = "${result} >> `${branchName}`"
+    result = result + "`"
 
-    result = result + " [#${buildNumber}] on [${nodeName}] (<${url}|Open>)"
+    if (branchName != null) result = "${result} [${branchName}] "
+
+    result = result + "[#${buildNumber}] [${nodeName}]`"
+    result = result + "\n(<${url}|Open>)"
     result = result + "\n${title.trim()}"
 
     return result
