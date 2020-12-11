@@ -6,9 +6,8 @@ void notifyMessage( custom_message ) {
   JenkinsStatus status = new JenkinsStatus()
 
   def blocks = formatter.format custom_message
-  def colors = new Color()
   
-  sender.send blocks, colors.blue()
+  return sender.send( blocks )
 }
 
 void notifyStart() {
@@ -17,16 +16,14 @@ void notifyStart() {
   JenkinsStatus status = new JenkinsStatus()
 
   def blocks = formatter.format 'Build started...'
-  def color = status.getStatusColor()
 
-  return sender.send blocks, color
+  return sender.send( blocks )
 }
 
 
 void notifyError(Throwable err) {
   def formatter = new SlackFormatter()
   def sender = new SlackSender()
-  def color = new Color().red()
 
   def message = formatter.format ":interrobang: An error occurred "
 
@@ -36,7 +33,7 @@ void notifyError(Throwable err) {
 
   message += "\nError: `${err}`"
 
-  return sender.send message, color
+  return sender.send message
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
@@ -58,7 +55,6 @@ void notifyResult() {
     return
   }
 
-  def color = status.getStatusColor()
   def duration = helper.getDuration()
 
   String changes = null
@@ -72,7 +68,7 @@ void notifyResult() {
 
   def message = formatter.formatResult "${statusMessage} after ${duration}", changes, testSummary
 
-  return sender.send message, color
+  return sender.send message
 }
 
 void notifyResultFull() {
