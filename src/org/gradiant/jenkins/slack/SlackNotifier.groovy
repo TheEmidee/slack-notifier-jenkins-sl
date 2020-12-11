@@ -6,7 +6,8 @@ void notifyMessage( custom_message ) {
 
   def blocks = formatter.format custom_message
   
-  //return sender.send( blocks )
+  def result = sender.sendBlocks blocks
+  return result
 }
 
 void notifyStart() {
@@ -27,7 +28,7 @@ void notifyError( slackResponse, Throwable err) {
 
   def blocks = formatter.formatError err
   sender.updateMessage( slackResponse, blocks )
-  slackResponse.addReaction( "x" )
+  //slackResponse.addReaction( "x" )
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
@@ -51,11 +52,11 @@ void notifySuccess( slackResponse ) {
   def blocks = formatter.formatSuccess()
   sender.updateMessage( slackResponse, blocks )
 
-  if ( status.isBackToNormal() ) {
-    slackResponse.addReaction( "party_parrot" )
-  } else {
-    slackResponse.addReaction( "heavy_check_mark" )
-  }
+  // if ( status.isBackToNormal() ) {
+  //   slackResponse.addReaction( "party_parrot" )
+  // } else {
+  //   slackResponse.addReaction( "heavy_check_mark" )
+  // }
 }
 
 void notifyStage( slackResponse, String stage_name ) {
@@ -71,9 +72,6 @@ void notifyStage( slackResponse, String stage_name ) {
   sender.updateMessage( slackResponse, blocks )
 }
 
-void notifyResultFull() {
-  env.TEST_SUMMARY = true
-  env.CHANGE_LIST = true
-  env.NOTIFY_SUCCESS = true
-  return notifyResult()
+void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
+  slackUploadFile( channel: slackResponse.channelId + ":" + slackResponse.ts, filePath: filePath, initialComment: comment )
 }

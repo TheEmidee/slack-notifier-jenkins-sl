@@ -1,7 +1,11 @@
 package org.gradiant.jenkins.slack
 
 String getNodeName() {
-    return env.NODE_NAME
+    String result = env.NODE_NAME
+    if ( result == null ) {
+        result = "";
+    }
+    return result
 }
 
 String getBranchName() {

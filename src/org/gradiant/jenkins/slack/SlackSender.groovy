@@ -15,7 +15,6 @@ void sendMessage(String message) {
   slackSend options
 }
 
-
 def getOptions(String message = '', String color = '') {
   def obj = [
     message: message

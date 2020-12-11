@@ -28,23 +28,23 @@ boolean hasBeenSuccessful() {
 
 String getStatusMessage() {
   if (isBackToNormal()) {
-    return 'Back to normal'
+    return ':party_parrot: *Back to normal* :party_parrot:'
   }
 
   if (stillFailing()) {
-    return 'Still failing'
+    return ':finnadie: *Still failing* :finnadie:'
   }
 
   if (hasFailed()) {
-    return 'Failure'
+    return ':x: *Failure* :x:'
   }
 
   if (hasBeenSuccessful()) {
-    return 'Success'
+    return ':tada: *Success* :tada:'
   }
 
   if (isUnstable()) {
-    return 'Unstable'
+    return ':heavy_multiplication_x: *Unstable* :heavy_multiplication_x:'
   }
 
   return ''
