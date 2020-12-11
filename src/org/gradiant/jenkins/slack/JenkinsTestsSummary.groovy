@@ -13,7 +13,7 @@ String getTestSummary() {
     def failed = testResultAction.getFailCount()
     def skipped = testResultAction.getSkipCount()
 
-    summary = "Test results:\n\t"
+    summary = "*Test results:*\n\t"
     summary = summary + ("Passed: " + (total - failed - skipped))
     summary = summary + (", Failed: " + failed)
     summary = summary + (", Skipped: " + skipped)

@@ -1,7 +1,6 @@
 package org.gradiant.jenkins.slack
 
-
-String format(String title = '') {
+String format(String content = '') {
     def helper = new JenkinsHelper()
 
     def project = helper.getProjectName()
@@ -12,82 +11,67 @@ String format(String title = '') {
 
     blocks = 
     [
-        {
+        [
             "type": "header",
-            "text": {
+            "text": [
                 "type": "plain_text",
                 "text": project,
                 "emoji": true
-            }
-        },
-        {
+            ]
+        ],
+        [
             "type": "section",
-            "text": {
+            "text": [
                 "type": "mrkdwn",
-                "text": "*Branch name : * ${branchName}"
-            }
-        },
-        {
+                "text": "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}\n<${url}|Open>"
+            ],
+            "accessory": [
+                "type": "image",
+                "image_url": env.SLACK_PROJECT_THUMBNAIL,
+                "alt_text": "alt text for image"
+            ]
+        ],
+        [
+            "type": "divider"
+        ],
+        [
             "type": "section",
-            "text": {
+            "text": [
                 "type": "mrkdwn",
-                "text": "*Build Number : * #${buildNumber}"
-            }
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "*Node name : * ${nodeName}"
-            }
-        },
-		{
-			"type": "divider"
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "plain_text",
-				"text": title,
-				"emoji": true
-			}
-		},
-		{
-			"type": "divider"
-		},
-		{
-			"type": "actions",
-			"elements": [
-				{
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"text": "Open",
-						"emoji": true
-					},
-					"value": "open_job_page",
-					"url": url,
-					"action_id": "open_job_page"
-				}
-			]
-		}
+                "text": content
+            ]
+        ]
     ]
 
     return blocks
-
-    // def result = "*${project}*\n"
-
-    // if (branchName != null) result = "${result} [${branchName}] "
-
-    // result = result + "[#${buildNumber}] [${nodeName}]"
-    // result = result + "\n(<${url}|Open>)"
-    // result = result + "\n\n${title.trim()}"
-
-    // return result
 }
 
-String formatResult(String title = '', String message = '', String testSummary = '') {
+String formatResult( String content_extra_infos = '' ) {
     def helper = new JenkinsHelper()
+    def status = new JenkinsStatus()
+    def config = new Config()
+
+    def project = helper.getProjectName()
+    def branchName = helper.getFullBranchName()
+    def buildNumber = helper.getBuildNumber()
+    def url = helper.getAbsoluteUrl()
+    def nodeName = helper.getNodeName()
+    
+    def statusMessage = status.getStatusMessage()
+    def duration = helper.getDuration()
+
+    String changes = "*Changes :*\n"
+    if(config.getChangeList()) {
+        changes += helper.getChanges().join '\n'
+    }
+
+    if (config.getTestSummary()) {
+        JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
+        changes += jenkinsTestsSummary.getTestSummary()
+    }
+
+    def content = "${statusMessage} after ${duration}"
+    content = content + content_extra_infos
 
     def logsUrl = helper.getConsoleLogsUrl()
     def testsUrl = helper.getTestsResultUrl()
@@ -95,11 +79,77 @@ String formatResult(String title = '', String message = '', String testSummary =
     def githubPRUrl = helper.getGitHubPRUrl()
     def rebuildUrl = helper.getRebuildUrl()
 
-    def result = format title
+    blocks = 
+    [
+        [
+            "type": "header",
+            "text": [
+                "type": "plain_text",
+                "text": project,
+                "emoji": true
+            ]
+        ],
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
+                "text": "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}\n<${url}|Open>"
+            ],
+            "accessory": [
+                "type": "image",
+                "image_url": env.SLACK_PROJECT_THUMBNAIL,
+                "alt_text": "alt text for image"
+            ]
+        ],
+        [
+            "type": "divider"
+        ],
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
+                "text": content
+            ]
+        ],
+        [
+            "type": "divider"
+        ],
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
+                "text": "[ <${logsUrl}|ConsoleLog> ] - [ <${testsUrl}|Test Result> ] - [ <${artifactsUrl}|Artifacts> ] - [ <${githubPRUrl}|GitHub PR> ] - [ <${rebuildUrl}|Rebuild Job> ]",
+            ]
+        ],
+        [
+            "type": "divider"
+        ],
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
+                "text": changes,
+            ]
+        ]
+    ]
 
-    result = result + "\n\n(<${logsUrl}|ConsoleLog>) - (<${testsUrl}|Test Result>) - (<${artifactsUrl}|Artifacts>) - (<${githubPRUrl}|GitHub PR>) - (<${rebuildUrl}|Rebuild Job>)"
-    if (message) result = result + "\n\nChanges:\n\t ${message.trim()}"
-    if (testSummary) result = result + "\n ${testSummary}"
+    return blocks
+}
 
-    return result
+String formatSuccess() {
+    def blocks = formatResult()
+    return blocks
+}
+
+String formatError( Throwable error ) {
+    String extra_infos = ''
+
+    if ( env.CURRENT_STEP != null ) {
+        extra_infos += "\nwhile executing ${env.CURRENT_STEP}"
+    }
+
+    extra_infos += "\nError: `${error}`"
+
+    def blocks = formatResult extra_infos
+    return blocks
 }

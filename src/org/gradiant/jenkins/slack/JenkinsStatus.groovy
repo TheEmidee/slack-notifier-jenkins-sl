@@ -1,6 +1,5 @@
 package org.gradiant.jenkins.slack
 
-
 boolean isBackToNormal() {
   def current = currentBuild.currentResult
   def previous = currentBuild.previousBuild?.currentResult
@@ -8,14 +7,12 @@ boolean isBackToNormal() {
   return current == 'SUCCESS' && (previous == 'FAILURE' || previous == 'UNSTABLE')
 }
 
-
 boolean stillFailing() {
   def current = currentBuild.currentResult
   def previous = currentBuild.previousBuild?.currentResult
 
   return current == 'FAILURE' && previous == 'UNSTABLE'
 }
-
 
 boolean hasFailed() {
   return currentBuild.currentResult == 'FAILURE'
@@ -25,11 +22,9 @@ boolean isUnstable() {
   return currentBuild.currentResult == 'UNSTABLE'
 }
 
-
 boolean hasBeenSuccessful() {
   return currentBuild.currentResult == 'SUCCESS'
 }
-
 
 String getStatusMessage() {
   if (isBackToNormal()) {

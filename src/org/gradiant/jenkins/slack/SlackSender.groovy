@@ -6,6 +6,10 @@ void sendBlocks(blocks) {
   //slackSend options
 }
 
+void updateMessage( slackResponse, blocks ) {
+  slackSend( channel: slackResponse.channelId, teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks, timestamp: slackResponse.ts )
+}
+
 void sendMessage(String message) {
   options = getOptions( message )
   slackSend options
@@ -32,8 +36,6 @@ def getOptions(String message = '', String color = '') {
   if (env.SLACK_CREDENTIALS) {
     obj.tokenCredentialId = env.SLACK_CREDENTIALS
   }
-
-
 
   return obj
 }
