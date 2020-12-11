@@ -29,12 +29,15 @@ String formatResult(String title = '', String message = '', String testSummary =
     def artifactsUrl = helper.getArtifactsUrl()
     def githubPRUrl = helper.getGitHubPRUrl()
     def rebuildUrl = helper.getRebuildUrl()
+    def description = helper.getBuildDescription()
 
     def result = format title
 
     result = result + "\n(<${logsUrl}|ConsoleLog>) - (<${testsUrl}|Test Result>) - (<${artifactsUrl}|Artifacts>) - (<${githubPRUrl}|GitHub PR>) - (<${rebuildUrl}|Rebuild Job>)"
     if (message) result = result + "\nChanges:\n\t ${message.trim()}"
     if (testSummary) result = result + "\n ${testSummary}"
+
+    result = result + "\n\n *Description*:\n${description}"
 
     return result
 }
