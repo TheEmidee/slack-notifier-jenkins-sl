@@ -14,9 +14,8 @@ String format(String title = '') {
 
     if (branchName != null) result = "${result} >> `${branchName}`"
 
-    result = result + " on [${nodeName}]"
-
-    result = "${result} - #${buildNumber} ${title.trim()} (<${url}|Open>)"
+    result = result + " [#${buildNumber}] on [${nodeName}] (<${url}|Open>)"
+    result = result + "\n${title.trim()}"
 
     return result
 }
