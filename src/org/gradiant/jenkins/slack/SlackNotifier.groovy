@@ -28,6 +28,16 @@ void notifyError( slackResponse, Throwable err) {
 
   def blocks = formatter.formatError err
   sender.updateMessage( slackResponse, blocks )
+
+  def userIds = slackUserIdsFromCommitters()
+
+  echo "userIds"
+  echo userIds.toString()
+
+  def userIdsString = userIds.collect { "<@$it>" }.join(' ')
+
+  echo "userIdsString"
+  echo userIdsString.toString()
   //slackResponse.addReaction( "x" )
 }
 
