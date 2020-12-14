@@ -1,12 +1,19 @@
 package org.gradiant.jenkins.slack
 
 
-void send(String message, String color = '#fff') {
-  def options = getOptions message, color
-
-  slackSend options
+void sendBlocks(blocks) {
+  return slackSend( channel: /*env.SLACK_CHANNEL*/ "test-jenkinscactus", teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks )
+  //slackSend options
 }
 
+void updateMessage( slackResponse, blocks ) {
+  slackSend( channel: slackResponse.channelId, teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks, timestamp: slackResponse.ts )
+}
+
+void sendMessage(String message) {
+  options = getOptions( message )
+  slackSend options
+}
 
 def getOptions(String message = '', String color = '') {
   def obj = [

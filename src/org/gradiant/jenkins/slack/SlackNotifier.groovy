@@ -1,55 +1,46 @@
 package org.gradiant.jenkins.slack
 
 void notifyMessage( custom_message ) {
-  SlackFormatter formatter = new SlackFormatter()
-  SlackSender sender = new SlackSender()
-  JenkinsStatus status = new JenkinsStatus()
+  def formatter = new SlackFormatter()
+  def sender = new SlackSender()
 
-  def message = formatter.format custom_message
-  def colors = new Color()
+  def blocks = formatter.format custom_message
   
-  sender.send message, colors.blue()
+  def result = sender.sendBlocks blocks
+  return result
 }
 
 void notifyStart() {
-  SlackFormatter formatter = new SlackFormatter()
-  SlackSender sender = new SlackSender()
-  JenkinsStatus status = new JenkinsStatus()
-
-  def message = formatter.format 'Build started...'
-  def color = status.getStatusColor()
-
-  sender.send message, color
-}
-
-
-void notifyError(Throwable err) {
   def formatter = new SlackFormatter()
   def sender = new SlackSender()
-  def color = new Color().red()
 
-  def message = formatter.format ":interrobang: An error occurred "
+  def blocks = formatter.format 'Build started...'
+  def result = sender.sendBlocks blocks
 
-  if ( env.CURRENT_STEP != null ) {
-    message += "\nwhile executing ${env.CURRENT_STEP}"
-  }
+  env.SLACK_ALL_STAGES = ''
 
-  message += "\nError: `${err}`"
+  return result
+}
 
-  sender.send message, color
+void notifyError( slackResponse, Throwable err) {
+  def formatter = new SlackFormatter()
+  def sender = new SlackSender()
+
+  def blocks = formatter.formatError err
+  sender.updateMessage( slackResponse, blocks )
+  //slackResponse.addReaction( "x" )
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
-  Config config = new Config()
+  def config = new Config()
   return statusMessage == 'Success' && !config.getNotifySuccess()
 }
 
-void notifyResult() {
-  JenkinsHelper helper = new JenkinsHelper()
-  JenkinsStatus status = new JenkinsStatus()
-  SlackFormatter formatter = new SlackFormatter()
-  SlackSender sender = new SlackSender()
-  Config config = new Config()
+void notifySuccess( slackResponse ) {
+  def helper = new JenkinsHelper()
+  def formatter = new SlackFormatter()
+  def sender = new SlackSender()
+  def status = new JenkinsStatus()
 
   def statusMessage = status.getStatusMessage()
 
@@ -58,26 +49,29 @@ void notifyResult() {
     return
   }
 
-  def color = status.getStatusColor()
-  def duration = helper.getDuration()
+  def blocks = formatter.formatSuccess()
+  sender.updateMessage( slackResponse, blocks )
 
-  String changes = null
-  if(config.getChangeList()) changes = helper.getChanges().join '\n'
-
-  String testSummary = null
-  if (config.getTestSummary()) {
-    JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
-    testSummary = jenkinsTestsSummary.getTestSummary()
-  }
-
-  def message = formatter.formatResult "${statusMessage} after ${duration}", changes, testSummary
-
-  sender.send message, color
+  // if ( status.isBackToNormal() ) {
+  //   slackResponse.addReaction( "party_parrot" )
+  // } else {
+  //   slackResponse.addReaction( "heavy_check_mark" )
+  // }
 }
 
-void notifyResultFull() {
-  env.TEST_SUMMARY = true
-  env.CHANGE_LIST = true
-  env.NOTIFY_SUCCESS = true
-  notifyResult()
+void notifyStage( slackResponse, String stage_name ) {
+  def formatter = new SlackFormatter()
+  def sender = new SlackSender()
+
+  if ( env.SLACK_ALL_STAGES != null && env.SLACK_ALL_STAGES != '' ) {
+    env.SLACK_ALL_STAGES += " :heavy_check_mark: \n"
+  }
+  env.SLACK_ALL_STAGES += "* ${stage_name}"
+
+  def blocks = formatter.format env.SLACK_ALL_STAGES
+  sender.updateMessage( slackResponse, blocks )
+}
+
+void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
+  slackUploadFile( channel: slackResponse.channelId + ":" + slackResponse.ts, filePath: filePath, initialComment: comment )
 }
