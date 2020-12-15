@@ -1,6 +1,5 @@
 package org.gradiant.jenkins.slack
 
-
 void sendBlocks(blocks) {
   return slackSend( channel: /*env.SLACK_CHANNEL*/ "test-jenkinscactus", teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks )
 }

@@ -22,66 +22,15 @@ void notifyStart() {
   return result
 }
 
-@NonCPS
-def myMethod() {
-    echo "changeset raw"
-  def changeLogSets = currentBuild.rawBuild.changeSets
-  for (int i = 0; i < changeLogSets.size(); i++) {
-      def entries = changeLogSets[i].items
-      for (int j = 0; j < entries.length; j++) {
-          def entry = entries[j]
-          echo "${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}"
-          // def files = new ArrayList(entry.affectedFiles)
-          // for (int k = 0; k < files.size(); k++) {
-          //     def file = files[k]
-          //     echo "  ${file.editType.name} ${file.path}"
-          // }
-      }
-  }
-}
-
-@NonCPS
-def myMethod2() {
-    echo "changeset"
-  def changeLogSets = currentBuild.changeSets
-  for (int i = 0; i < changeLogSets.size(); i++) {
-      def entries = changeLogSets[i].items
-      for (int j = 0; j < entries.length; j++) {
-          def entry = entries[j]
-          echo "${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}"
-
-          def userId = slackUserIdFromEmail( 'mcihael.delva@fishingcactus.com' )
-          echo "slackUserId : ${userId}"
-
-          // def files = new ArrayList(entry.affectedFiles)
-          // for (int k = 0; k < files.size(); k++) {
-          //     def file = files[k]
-          //     echo "  ${file.editType.name} ${file.path}"
-          // }
-      }
-  }
-}
-
 void notifyError( slackResponse, Throwable err) {
   def formatter = new SlackFormatter()
   def sender = new SlackSender()
+  def helper = new JenkinsHelper()
 
   def blocks = formatter.formatError err
   sender.updateMessage( slackResponse, blocks )
 
-  //myMethod()
-  myMethod2()
-
-  // def userIds = slackUserIdsFromCommitters()
-
-  // echo "userIds"
-  // println( userIds )
-
-  // def userIdsString = userIds.collect { "<@$it>" }.join(' ')
-
-  // echo "userIdsString"
-  // println( userIdsString )
-  //slackResponse.addReaction( "x" )
+  notifyUsers()
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
@@ -105,6 +54,8 @@ void notifySuccess( slackResponse ) {
   def blocks = formatter.formatSuccess()
   sender.updateMessage( slackResponse, blocks )
 
+  notifyUsers()
+
   // if ( status.isBackToNormal() ) {
   //   slackResponse.addReaction( "party_parrot" )
   // } else {
@@ -127,4 +78,29 @@ void notifyStage( slackResponse, String stage_name ) {
 
 void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
   slackUploadFile( channel: slackResponse.channelId + ":" + slackResponse.ts, filePath: filePath, initialComment: comment )
+}
+
+void notifyUsers() {
+  def status = new JenkinsStatus()
+
+  def statusMessage = status.getStatusMessage()
+  def statusColor = status.getStatusColor()
+
+  def users_to_notify = helper.getUsersToNotify()
+  println( "notifyUsers" )
+
+  for (int i = 0; i < users_to_notify.size(); i++) {
+    def user = users_to_notify[i]
+    println( user )
+    
+    def user_mail = "${user}@${env.SLACK_MAIL_DOMAIN}"
+    println( user )
+
+    def user_id = slackUserIdFromEmail( user_mail )
+    println( user_id )
+
+    if ( user_id != null ) {
+      slackSend( color: statusColor, message: "<@$user_id> : ${status_message}")
+    }
+  }
 }

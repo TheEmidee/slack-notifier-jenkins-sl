@@ -8,6 +8,14 @@ String getNodeName() {
     return result
 }
 
+String getFallbackUserToNotify() {
+    return env.SLACK_FALLBACK_USER_TO_NOTIFY
+}
+
+void setFallbackUserToNotify( String user_name ) {
+  env.SLACK_FALLBACK_USER_TO_NOTIFY = user_name
+}
+
 String getAuthorName() {
     return env.SLACK_AUTHOR_NAME
 }
@@ -140,6 +148,20 @@ List<String> getChanges() {
     return messages
 }
 
+List<String> getChangesAuthors() {
+    List<String> authors = []
+    for (int i = 0; i < currentBuild.changeSets.size(); i++) {
+        def entries = currentBuild.changeSets[i].items
+        for (int j = 0; j < entries.length; j++) {
+            if ( !authors.contains( entry.author ) ) {
+                authors.add( entry.author )
+            }
+        }
+    }
+
+    return authors
+}
+
 String getDuration() {
     return currentBuild.durationString.replace(' and counting', '')
 }
@@ -156,4 +178,15 @@ String getPreviousStatus() {
     }
 
     return prev
+}
+
+List<String> getUsersToNotify() {
+    def authors = getChangesAuthors()
+
+    if ( authors.size() == 0 ) {
+        def fallback = getFallbackUserToNotify()
+        authors.add( fallback )
+    }
+
+    return authors
 }
