@@ -81,10 +81,17 @@ void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
 }
 
 void notifyUsers() {
+  def config = new Config()
+
+  if(config.getNotifyUsersWithDirectMessage() == false) {
+    println("SlackNotifier - No direct message will be sent to users")
+    return
+  }
+
   def status = new JenkinsStatus()
   def helper = new JenkinsHelper()
 
-  def status_message = status.getStatusMessage()
+  def status_message = status.getDirectMessage()
   def status_color = status.getStatusColor()
   def users_to_notify = helper.getUsersToNotify()
 
