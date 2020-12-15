@@ -74,7 +74,7 @@ String getDirectMessage() {
   def mrkdwn = "<${job_url}|${full_branch_name}>"
 
   if (isBackToNormal()) {
-    return "Yay ! The Jenkins job ${mrkdwn} is now back to normal ! :star-truck:"
+    return "Yay ! The Jenkins job ${mrkdwn} is now back to normal ! :star-struck:"
   }
 
   if (stillFailing()) {
