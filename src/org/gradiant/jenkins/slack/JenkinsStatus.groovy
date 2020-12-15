@@ -64,3 +64,34 @@ String getStatusColor() {
 
   return colors.yellow()
 }
+
+String getDirectMessage() {
+  def helper = new JenkinsHelper()
+  def config = new Config()
+
+  def full_branch_name = helper.getFullBranchName()
+  def job_url = helper.getAbsoluteUrl()
+  def mrkdwn = "<${job_url}|${full_branch_name}>"
+
+  if (isBackToNormal()) {
+    return "Yay ! The Jenkins job ${mrkdwn} is now back to normal ! :star-struck:"
+  }
+
+  if (stillFailing()) {
+    return "I'm really sorry but the Jenkins job ${mrkdwn} is still failing :scream:"
+  }
+
+  if (hasFailed()) {
+    return "Psssst ! Sorry to disturb you...\nI'm just letting you know that the Jenkins job ${mrkdwn} has failed :cry:\n(Don't worry, that stays between us :shushing_face:)"
+  }
+
+  if (hasBeenSuccessful() && config.getNotifyUsersWithDirectMessageOnSuccess() ) {
+    return "Good job buddy !\nThe Jenkins job ${mrkdwn} has been successful ! :sunglasses:"
+  }
+
+  if (isUnstable()) {
+    return "Psssst ! Sorry to disturb you.\nI'm just letting you know that the Jenkins job ${mrkdwn} is unstable.\nI thought you might want to have a look :wink:"
+  }
+
+  return ''
+}

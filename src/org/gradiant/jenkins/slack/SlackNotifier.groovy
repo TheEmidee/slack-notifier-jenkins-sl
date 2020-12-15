@@ -25,10 +25,12 @@ void notifyStart() {
 void notifyError( slackResponse, Throwable err) {
   def formatter = new SlackFormatter()
   def sender = new SlackSender()
+  def helper = new JenkinsHelper()
 
   def blocks = formatter.formatError err
   sender.updateMessage( slackResponse, blocks )
-  //slackResponse.addReaction( "x" )
+
+  notifyUsers()
 }
 
 boolean shouldNotNotifySuccess(statusMessage) {
@@ -52,6 +54,8 @@ void notifySuccess( slackResponse ) {
   def blocks = formatter.formatSuccess()
   sender.updateMessage( slackResponse, blocks )
 
+  notifyUsers()
+
   // if ( status.isBackToNormal() ) {
   //   slackResponse.addReaction( "party_parrot" )
   // } else {
@@ -74,4 +78,31 @@ void notifyStage( slackResponse, String stage_name ) {
 
 void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
   slackUploadFile( channel: slackResponse.channelId + ":" + slackResponse.ts, filePath: filePath, initialComment: comment )
+}
+
+void notifyUsers() {
+  def config = new Config()
+
+  if(config.getNotifyUsersWithDirectMessage() == false) {
+    println("SlackNotifier - No direct message will be sent to users")
+    return
+  }
+
+  def status = new JenkinsStatus()
+  def helper = new JenkinsHelper()
+
+  def status_message = status.getDirectMessage()
+  def status_color = status.getStatusColor()
+  def users_to_notify = helper.getUsersToNotify()
+
+  for (int i = 0; i < users_to_notify.size(); i++) {
+    def user_mail = users_to_notify[i]
+    println( "Notify slack user : ${user_mail}" )
+
+    def user_id = slackUserIdFromEmail( user_mail )
+
+    if ( user_id != null ) {
+      slackSend( channel: "@${user_id}", color: status_color, message: status_message )
+    }
+  }
 }
