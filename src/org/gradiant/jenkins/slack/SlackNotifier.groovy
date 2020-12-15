@@ -22,17 +22,9 @@ void notifyStart() {
   return result
 }
 
-void notifyError( slackResponse, Throwable err) {
-  def formatter = new SlackFormatter()
-  def sender = new SlackSender()
-
-  def blocks = formatter.formatError err
-  sender.updateMessage( slackResponse, blocks )
-
-  echo "changeset"
-  println(currentBuild.changeSets) 
-
-  echo "changeset raw"
+@NonCPS
+def myMethod() {
+    echo "changeset raw"
   def changeLogSets = currentBuild.rawBuild.changeSets
   for (int i = 0; i < changeLogSets.size(); i++) {
       def entries = changeLogSets[i].items
@@ -46,6 +38,19 @@ void notifyError( slackResponse, Throwable err) {
           }
       }
   }
+}
+
+void notifyError( slackResponse, Throwable err) {
+  def formatter = new SlackFormatter()
+  def sender = new SlackSender()
+
+  def blocks = formatter.formatError err
+  sender.updateMessage( slackResponse, blocks )
+
+  echo "changeset"
+  println(currentBuild.changeSets) 
+
+  myMethod()
 
   def userIds = slackUserIdsFromCommitters()
 
