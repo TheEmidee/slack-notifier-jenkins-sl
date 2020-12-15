@@ -31,11 +31,33 @@ def myMethod() {
       for (int j = 0; j < entries.length; j++) {
           def entry = entries[j]
           echo "${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}"
-          def files = new ArrayList(entry.affectedFiles)
-          for (int k = 0; k < files.size(); k++) {
-              def file = files[k]
-              echo "  ${file.editType.name} ${file.path}"
-          }
+          // def files = new ArrayList(entry.affectedFiles)
+          // for (int k = 0; k < files.size(); k++) {
+          //     def file = files[k]
+          //     echo "  ${file.editType.name} ${file.path}"
+          // }
+      }
+  }
+}
+
+@NonCPS
+def myMethod2() {
+    echo "changeset"
+  def changeLogSets = currentBuild.changeSets
+  for (int i = 0; i < changeLogSets.size(); i++) {
+      def entries = changeLogSets[i].items
+      for (int j = 0; j < entries.length; j++) {
+          def entry = entries[j]
+          echo "${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}"
+
+          def userId = slackUserIdFromEmail( 'mcihael.delva@fishingcactus.com' )
+          echo "slackUserId : ${userId}"
+
+          // def files = new ArrayList(entry.affectedFiles)
+          // for (int k = 0; k < files.size(); k++) {
+          //     def file = files[k]
+          //     echo "  ${file.editType.name} ${file.path}"
+          // }
       }
   }
 }
@@ -47,20 +69,18 @@ void notifyError( slackResponse, Throwable err) {
   def blocks = formatter.formatError err
   sender.updateMessage( slackResponse, blocks )
 
-  echo "changeset"
-  println(currentBuild.changeSets) 
+  //myMethod()
+  myMethod2()
 
-  myMethod()
+  // def userIds = slackUserIdsFromCommitters()
 
-  def userIds = slackUserIdsFromCommitters()
+  // echo "userIds"
+  // println( userIds )
 
-  echo "userIds"
-  println( userIds )
+  // def userIdsString = userIds.collect { "<@$it>" }.join(' ')
 
-  def userIdsString = userIds.collect { "<@$it>" }.join(' ')
-
-  echo "userIdsString"
-  println( userIdsString )
+  // echo "userIdsString"
+  // println( userIdsString )
   //slackResponse.addReaction( "x" )
 }
 
