@@ -82,7 +82,8 @@ void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
 
 void notifyUsers() {
   def status = new JenkinsStatus()
-
+  def helper = new JenkinsHelper()
+  
   def statusMessage = status.getStatusMessage()
   def statusColor = status.getStatusColor()
 
