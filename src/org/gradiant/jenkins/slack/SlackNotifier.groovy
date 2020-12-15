@@ -83,9 +83,9 @@ void uploadFileToMessage( slackResponse, filePath, String comment = '' ) {
 void notifyUsers() {
   def status = new JenkinsStatus()
   def helper = new JenkinsHelper()
-  
-  def statusMessage = status.getStatusMessage()
-  def statusColor = status.getStatusColor()
+
+  def status_message = status.getStatusMessage()
+  def status_color = status.getStatusColor()
 
   def users_to_notify = helper.getUsersToNotify()
   println( "notifyUsers" )
@@ -101,7 +101,7 @@ void notifyUsers() {
     println( user_id )
 
     if ( user_id != null ) {
-      slackSend( color: statusColor, message: "<@$user_id> : ${status_message}")
+      slackSend( color: status_color, message: "<@$user_id> : ${status_message}")
     }
   }
 }

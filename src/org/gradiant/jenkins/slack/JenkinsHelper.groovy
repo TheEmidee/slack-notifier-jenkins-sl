@@ -148,6 +148,7 @@ List<String> getChanges() {
     return messages
 }
 
+@NonCPS
 List<String> getChangesAuthors() {
     List<String> authors = []
     for (int i = 0; i < currentBuild.changeSets.size(); i++) {
@@ -155,7 +156,7 @@ List<String> getChangesAuthors() {
         for (int j = 0; j < entries.length; j++) {
             def entry = entries[j]
             if ( !authors.contains( entry.author ) ) {
-                authors.add( entry.author )
+                authors.add( entry.author.toString() )
             }
         }
     }
