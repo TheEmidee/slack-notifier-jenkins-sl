@@ -8,6 +8,7 @@ String format(String content = '') {
     def buildNumber = helper.getBuildNumber()
     def url = helper.getAbsoluteUrl()
     def nodeName = helper.getNodeName()
+    def description = helper.getDescription()
 
     blocks = 
     [
@@ -38,6 +39,16 @@ String format(String content = '') {
             "type": "section",
             "text": [
                 "type": "mrkdwn",
+                "text": "```${description}```"
+            ]
+        ],
+        [
+            "type": "divider"
+        ],
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
                 "text": content
             ]
         ]
@@ -56,7 +67,8 @@ String formatResult( String content_extra_infos = '' ) {
     def buildNumber = helper.getBuildNumber()
     def url = helper.getAbsoluteUrl()
     def nodeName = helper.getNodeName()
-    
+    def description = helper.getDescription()
+
     def statusMessage = status.getStatusMessage()
     def duration = helper.getDuration()
 
@@ -109,6 +121,13 @@ String formatResult( String content_extra_infos = '' ) {
             "text": [
                 "type": "mrkdwn",
                 "text": content
+            ]
+        ],
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
+                "text": "```${description}```"
             ]
         ],
         [

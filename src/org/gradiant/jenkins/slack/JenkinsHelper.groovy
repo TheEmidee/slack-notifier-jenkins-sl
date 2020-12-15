@@ -8,6 +8,10 @@ String getNodeName() {
     return result
 }
 
+String getDescription() {
+    return currentBuild.description
+}
+
 String getBranchName() {
     String result = ""
 
