@@ -153,6 +153,7 @@ List<String> getChangesAuthors() {
     for (int i = 0; i < currentBuild.changeSets.size(); i++) {
         def entries = currentBuild.changeSets[i].items
         for (int j = 0; j < entries.length; j++) {
+            def entry = entries[j]
             if ( !authors.contains( entry.author ) ) {
                 authors.add( entry.author )
             }
