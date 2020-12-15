@@ -82,15 +82,15 @@ String getDirectMessage() {
   }
 
   if (hasFailed()) {
-    return "Psssst ! Sorry to disturb you. I'm just letting you know that the Jenkins job ${mrkdwn} has failed :cry: (Don't worry, that stays between us :shushing_face:)"
+    return "Psssst ! Sorry to disturb you...\nI'm just letting you know that the Jenkins job ${mrkdwn} has failed :cry:\n(Don't worry, that stays between us :shushing_face:)"
   }
 
   if (hasBeenSuccessful() && config.getNotifyUsersWithDirectMessageOnSuccess() ) {
-    return "Good job buddy ! The Jenkins job ${mrkdwn} has been successful ! :sunglasses:"
+    return "Good job buddy !\nThe Jenkins job ${mrkdwn} has been successful ! :sunglasses:"
   }
 
   if (isUnstable()) {
-    return "Psssst ! Sorry to disturb you. I'm just letting you know that the Jenkins job ${mrkdwn} is unstable. I thought you might want to have a look :wink:"
+    return "Psssst ! Sorry to disturb you.\nI'm just letting you know that the Jenkins job ${mrkdwn} is unstable.\nI thought you might want to have a look :wink:"
   }
 
   return ''

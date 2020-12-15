@@ -156,8 +156,9 @@ List<String> getChangesAuthorEmails() {
         for (int j = 0; j < entries.length; j++) {
             def entry = entries[j]
             def author = entry.author.toString()
-            if ( !authors.contains( author ) ) {
-                authors.add( "${author}@${env.SLACK_MAIL_DOMAIN}" )
+            def email = "${author}@${env.SLACK_MAIL_DOMAIN}"
+            if ( !authors.contains( email ) ) {
+                authors.add( email )
             }
         }
     }
