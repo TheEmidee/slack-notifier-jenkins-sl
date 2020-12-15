@@ -14,7 +14,7 @@ String format(String content = '') {
 
     String author_name = helper.getAuthorName()
     if ( author_name != null ) {
-        infos += "\n*By : *${author_name}"
+        infos += "\n*By : * ${author_name}"
     }
 
     infos += "\n<${url}|Open>"
