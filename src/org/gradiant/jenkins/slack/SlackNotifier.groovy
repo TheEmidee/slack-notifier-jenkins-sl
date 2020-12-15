@@ -86,22 +86,16 @@ void notifyUsers() {
 
   def status_message = status.getStatusMessage()
   def status_color = status.getStatusColor()
-
   def users_to_notify = helper.getUsersToNotify()
-  println( "notifyUsers" )
 
   for (int i = 0; i < users_to_notify.size(); i++) {
-    def user = users_to_notify[i]
-    println( user )
-    
-    def user_mail = "${user}@${env.SLACK_MAIL_DOMAIN}"
-    println( user )
+    def user_mail = users_to_notify[i]
+    println( "Notify slack user : ${user_mail}" )
 
     def user_id = slackUserIdFromEmail( user_mail )
-    println( user_id )
 
     if ( user_id != null ) {
-      slackSend( color: status_color, message: "<@$user_id> : ${status_message}")
+      slackSend( channel: "@${user_id}", color: status_color, message: status_message )
     }
   }
 }

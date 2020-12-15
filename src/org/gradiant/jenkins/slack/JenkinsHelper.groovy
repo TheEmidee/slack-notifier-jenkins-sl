@@ -8,12 +8,12 @@ String getNodeName() {
     return result
 }
 
-String getFallbackUserToNotify() {
+String getFallbackEmailUserToNotify() {
     return env.SLACK_FALLBACK_USER_TO_NOTIFY
 }
 
-void setFallbackUserToNotify( String user_name ) {
-  env.SLACK_FALLBACK_USER_TO_NOTIFY = user_name
+void setFallbackEmailUserToNotify( String user_email ) {
+  env.SLACK_FALLBACK_USER_TO_NOTIFY = user_email
 }
 
 String getAuthorName() {
@@ -149,14 +149,15 @@ List<String> getChanges() {
 }
 
 @NonCPS
-List<String> getChangesAuthors() {
+List<String> getChangesAuthorEmails() {
     List<String> authors = []
     for (int i = 0; i < currentBuild.changeSets.size(); i++) {
         def entries = currentBuild.changeSets[i].items
         for (int j = 0; j < entries.length; j++) {
             def entry = entries[j]
-            if ( !authors.contains( entry.author ) ) {
-                authors.add( entry.author.toString() )
+            def author = entry.author.toString()
+            if ( !authors.contains( author ) ) {
+                authors.add( "${author}@${env.SLACK_MAIL_DOMAIN}" )
             }
         }
     }
@@ -183,10 +184,10 @@ String getPreviousStatus() {
 }
 
 List<String> getUsersToNotify() {
-    def authors = getChangesAuthors()
+    def authors = getChangesAuthorEmails()
 
     if ( authors.size() == 0 ) {
-        def fallback = getFallbackUserToNotify()
+        def fallback = getFallbackEmailUserToNotify()
         authors.add( fallback )
     }
 
