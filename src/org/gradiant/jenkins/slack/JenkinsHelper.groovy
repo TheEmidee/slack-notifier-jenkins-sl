@@ -33,6 +33,9 @@ void setAuthorAvatarURL( String author_avatar_url ) {
 }
 
 String getDescription() {
+    if ( currentBuild.description == null ) {
+        return "No Description"
+    }
     return currentBuild.description
 }
 
