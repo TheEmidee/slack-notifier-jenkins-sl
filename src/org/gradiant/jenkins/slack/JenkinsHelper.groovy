@@ -8,6 +8,22 @@ String getNodeName() {
     return result
 }
 
+String getAuthorName() {
+    return env.SLACK_AUTHOR_NAME
+}
+
+void setAuthorName( String author_name ) {
+  env.SLACK_AUTHOR_NAME = author_name
+}
+
+String getAuthorAvatarURL() {
+    return env.SLACK_AUTHOR_AVATAR_URL
+}
+
+void setAuthorAvatarURL( String author_avatar_url ) {
+  env.SLACK_AUTHOR_AVATAR_URL = author_avatar_url
+}
+
 String getDescription() {
     return currentBuild.description
 }

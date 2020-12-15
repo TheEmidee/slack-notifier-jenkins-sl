@@ -10,6 +10,15 @@ String format(String content = '') {
     def nodeName = helper.getNodeName()
     def description = helper.getDescription()
 
+    String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
+
+    String author_name = helper.getAuthorName()
+    if ( author_name != null ) {
+        infos += "\n*By : *${author_name}"
+    }
+
+    infos += "\n<${url}|Open>"
+
     blocks = 
     [
         [
@@ -24,7 +33,7 @@ String format(String content = '') {
             "type": "section",
             "text": [
                 "type": "mrkdwn",
-                "text": "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}\n<${url}|Open>"
+                "text": infos
             ],
             "accessory": [
                 "type": "image",
