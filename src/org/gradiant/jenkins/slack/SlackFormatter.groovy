@@ -184,8 +184,8 @@ String formatSuccess() {
 String formatError( Throwable error ) {
     String extra_infos = ''
 
-    if ( env.CURRENT_STEP != null ) {
-        extra_infos += "\nwhile executing ${env.CURRENT_STEP}"
+    if ( env.SLACK_CURRENT_STEP != null ) {
+        extra_infos += "\nwhile executing ${env.SLACK_CURRENT_STEP}"
     }
 
     extra_infos += "\nError: `${error}`"

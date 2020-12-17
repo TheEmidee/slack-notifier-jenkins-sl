@@ -16,6 +16,14 @@ void setFallbackEmailUserToNotify( String user_email ) {
   env.SLACK_FALLBACK_USER_TO_NOTIFY = user_email
 }
 
+String getCurrentStep() {
+    return env.SLACK_CURRENT_STEP
+}
+
+void setCurrentStep( String current_step ) {
+  env.SLACK_CURRENT_STEP = current_step
+}
+
 String getAuthorName() {
     return env.SLACK_AUTHOR_NAME
 }
