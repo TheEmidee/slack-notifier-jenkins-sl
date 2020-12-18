@@ -14,7 +14,7 @@ class SlackNotifier {
     return result
   }
 
-  public void notifyStart( steps ) {
+  public void notifyStart( steps = null ) {
     this.steps = steps
 
     def formatter = new SlackFormatter()
@@ -82,6 +82,10 @@ class SlackNotifier {
   }
 
   public void notifyUsers() {
+    if ( this.steps == null ) {
+      println( "Impossible to notify users. You must pass ( this ) to notifyStart so the script can call slackUserIdFromEmail" )
+    }
+
     def config = new Config()
 
     if(config.getNotifyUsersWithDirectMessage() == false) {
