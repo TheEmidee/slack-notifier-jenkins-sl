@@ -9,7 +9,6 @@ class SlackNotifier {
     def sender = new SlackSender()
 
     def blocks = formatter.format custom_message
-    
     def result = sender.sendBlocks blocks
     return result
   }
