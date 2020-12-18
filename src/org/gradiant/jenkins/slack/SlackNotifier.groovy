@@ -95,6 +95,7 @@ class SlackNotifier {
 
     def status = new JenkinsStatus()
     def helper = new JenkinsHelper()
+    def sender = new SlackSender()
 
     def status_message = status.getDirectMessage()
     def status_color = status.getStatusColor()
@@ -107,7 +108,7 @@ class SlackNotifier {
       def user_id = this.steps.slackUserIdFromEmail( user_mail )
 
       if ( user_id != null ) {
-        slackSend( channel: "@${user_id}", color: status_color, message: status_message )
+        sender.sendDirectMessage( "@${user_id}", status_message, status_color )
       }
     }
   }
