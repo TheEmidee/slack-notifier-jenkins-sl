@@ -3,6 +3,7 @@ package org.gradiant.jenkins.slack
 @Singleton
 class SlackNotifier {
   private slackResponse = null
+  private steps = null
 
   public void notifyMessage( custom_message ) {
     def formatter = new SlackFormatter()
@@ -13,7 +14,9 @@ class SlackNotifier {
     return result
   }
 
-  public void notifyStart() {
+  public void notifyStart( steps ) {
+    this.steps = steps
+
     def formatter = new SlackFormatter()
     def sender = new SlackSender()
 
@@ -97,7 +100,7 @@ class SlackNotifier {
       def user_mail = users_to_notify[i]
       println( "Notify slack user : ${user_mail}" )
 
-      def user_id = slackUserIdFromEmail( user_mail )
+      def user_id = this.steps.slackUserIdFromEmail( user_mail )
 
       if ( user_id != null ) {
         slackSend( channel: "@${user_id}", color: status_color, message: status_message )
