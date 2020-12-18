@@ -14,7 +14,7 @@ void sendMessage(String message) {
 }
 
 void sendDirectMessage( String user_id, String message, Color color ) {
-  slackSend( channel: "@${user_id}", color: color, message: message )
+  slackSend( channel: user_id, color: color, message: message )
 }
 
 def getOptions(String message = '', String color = '') {

@@ -4,6 +4,7 @@ package org.gradiant.jenkins.slack
 class SlackNotifier {
   private slackResponse = null
   private steps = null
+  private String allStages = ''
 
   public void notifyMessage( custom_message ) {
     def formatter = new SlackFormatter()
@@ -23,7 +24,7 @@ class SlackNotifier {
     def blocks = formatter.format 'Build started...'
     this.slackResponse = sender.sendBlocks blocks
 
-    env.SLACK_ALL_STAGES = ''
+    this.allStages = ''
 
     return this.slackResponse
   }
@@ -68,12 +69,12 @@ class SlackNotifier {
     def formatter = new SlackFormatter()
     def sender = new SlackSender()
 
-    if ( env.SLACK_ALL_STAGES != null && env.SLACK_ALL_STAGES != '' ) {
-      env.SLACK_ALL_STAGES += " :heavy_check_mark: \n"
+    if ( this.allStages != null && this.allStages != '' ) {
+      this.allStages += " :heavy_check_mark: \n"
     }
-    env.SLACK_ALL_STAGES += "* ${stage_name}"
+    this.allStages += "* ${stage_name}"
 
-    def blocks = formatter.format env.SLACK_ALL_STAGES
+    def blocks = formatter.format this.allStages
     sender.updateMessage( slackResponse, blocks )
   }
 
