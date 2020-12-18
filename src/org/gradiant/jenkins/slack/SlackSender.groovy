@@ -13,7 +13,7 @@ void sendMessage(String message) {
   slackSend options
 }
 
-void sendDirectMessage( String user_id, String message, Color color ) {
+void sendDirectMessage( String user_id, String message, String color ) {
   slackSend( channel: user_id, color: color, message: message )
 }
 
