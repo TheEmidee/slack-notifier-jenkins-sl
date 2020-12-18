@@ -6,7 +6,7 @@ class SlackNotifier {
   private steps = null
   private String allStages = ''
 
-  public void notifyMessage( custom_message ) {
+  public void notifyMessage( String custom_message ) {
     def formatter = new SlackFormatter()
     def sender = new SlackSender()
 
