@@ -22,6 +22,8 @@ class SlackNotifier {
     this.slackResponse = sender.sendBlocks blocks
 
     env.SLACK_ALL_STAGES = ''
+
+    return this.slackResponse
   }
 
   public void notifyError( Throwable err) {
