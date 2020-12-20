@@ -6,17 +6,18 @@ class SlackNotifier {
   private steps = null
   private String allStages = ''
   private config = null
+  private SlackSender slackSender = null
 
   public void initialize( config ) {
     this.config = config
+    this.slackSender = new SlackSender( this.config )
   }
 
   public void notifyMessage( String custom_message ) {
     def formatter = new SlackFormatter()
-    def sender = new SlackSender()
 
     def blocks = formatter.format custom_message
-    def result = sender.sendBlocks blocks
+    def result = this.slackSender.sendBlocks blocks
     return result
   }
 
@@ -24,10 +25,9 @@ class SlackNotifier {
     this.steps = steps
 
     def formatter = new SlackFormatter()
-    def sender = new SlackSender()
 
     def blocks = formatter.format 'Build started...'
-    this.slackResponse = sender.sendBlocks blocks
+    this.slackResponse = this.slackSender.sendBlocks blocks
 
     this.allStages = ''
 
@@ -36,11 +36,10 @@ class SlackNotifier {
 
   public void notifyError( Throwable err) {
     def formatter = new SlackFormatter()
-    def sender = new SlackSender()
     def helper = new JenkinsHelper()
 
     def blocks = formatter.formatError err
-    sender.updateMessage( slackResponse, blocks )
+    this.slackSender.updateMessage( slackResponse, blocks )
 
     notifyUsers()
   }
@@ -48,7 +47,6 @@ class SlackNotifier {
   public void notifySuccess() {
     def helper = new JenkinsHelper()
     def formatter = new SlackFormatter()
-    def sender = new SlackSender()
     def status = new JenkinsStatus()
 
     def statusMessage = status.getStatusMessage()
@@ -59,7 +57,7 @@ class SlackNotifier {
     }
 
     def blocks = formatter.formatSuccess()
-    sender.updateMessage( slackResponse, blocks )
+    this.slackSender.updateMessage( slackResponse, blocks )
 
     notifyUsers()
 
@@ -72,7 +70,6 @@ class SlackNotifier {
 
   public void notifyStage( String stage_name ) {
     def formatter = new SlackFormatter()
-    def sender = new SlackSender()
 
     if ( this.allStages != null && this.allStages != '' ) {
       this.allStages += " :heavy_check_mark: \n"
@@ -80,7 +77,7 @@ class SlackNotifier {
     this.allStages += "* ${stage_name}"
 
     def blocks = formatter.format this.allStages
-    sender.updateMessage( slackResponse, blocks )
+    this.slackSender.updateMessage( slackResponse, blocks )
   }
 
   public void uploadFileToMessage( filePath, String comment = '' ) {
@@ -101,7 +98,6 @@ class SlackNotifier {
 
     def status = new JenkinsStatus()
     def helper = new JenkinsHelper()
-    def sender = new SlackSender()
 
     def status_message = status.getDirectMessage()
     def status_color = status.getStatusColor()
@@ -114,7 +110,7 @@ class SlackNotifier {
       def user_id = this.steps.slackUserIdFromEmail( user_mail )
 
       if ( user_id != null ) {
-        sender.sendDirectMessage( "@${user_id}", status_message, status_color )
+        this.slackSender.sendDirectMessage( "@${user_id}", status_message, status_color )
       }
     }
   }
