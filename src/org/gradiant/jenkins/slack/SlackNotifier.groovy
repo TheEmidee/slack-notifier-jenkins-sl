@@ -5,6 +5,11 @@ class SlackNotifier {
   private slackResponse = null
   private steps = null
   private String allStages = ''
+  private config = null
+
+  public void initialize( config ) {
+    this.config = config
+  }
 
   public void notifyMessage( String custom_message ) {
     def formatter = new SlackFormatter()
