@@ -27,7 +27,7 @@ class SlackFormatter {
 
         infos += "\n<${url}|Open>"
 
-        blocks = 
+        def blocks = 
         [
             [
                 "type": "header",
@@ -117,7 +117,7 @@ class SlackFormatter {
         def githubPRUrl = helper.getGitHubPRUrl()
         def rebuildUrl = helper.getRebuildUrl()
 
-        blocks = 
+        def blocks = 
         [
             [
                 "type": "header",
