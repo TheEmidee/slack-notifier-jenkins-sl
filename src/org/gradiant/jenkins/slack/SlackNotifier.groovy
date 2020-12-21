@@ -117,7 +117,7 @@ class SlackNotifier {
   private List<String> getUsersToNotify() {
     def helper = new JenkinsHelper()
     
-    def authors = helpder.getChangesAuthorEmails()
+    def authors = helper.getChangesAuthorEmails()
 
     if ( authors.size() == 0 ) {
         def fallback = this.config.FallbackContactEmail
