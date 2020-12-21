@@ -78,7 +78,7 @@ class SlackNotifier {
   }
 
   public void notifyUsers() {
-    if ( this.steps == null ) {
+    if ( this.script == null ) {
       println( "Impossible to notify users. You must pass ( this ) to notifyStart so the script can call slackUserIdFromEmail" )
     }
 
