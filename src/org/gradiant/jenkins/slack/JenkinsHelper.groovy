@@ -8,36 +8,8 @@ String getNodeName() {
     return result
 }
 
-String getFallbackEmailUserToNotify() {
-    return env.SLACK_FALLBACK_USER_TO_NOTIFY
-}
-
-void setFallbackEmailUserToNotify( String user_email ) {
-  env.SLACK_FALLBACK_USER_TO_NOTIFY = user_email
-}
-
 String getCurrentStep() {
     return env.SLACK_CURRENT_STEP
-}
-
-void setCurrentStep( String current_step ) {
-  env.SLACK_CURRENT_STEP = current_step
-}
-
-String getAuthorName() {
-    return env.SLACK_AUTHOR_NAME
-}
-
-void setAuthorName( String author_name ) {
-  env.SLACK_AUTHOR_NAME = author_name
-}
-
-String getAuthorAvatarURL() {
-    return env.SLACK_AUTHOR_AVATAR_URL
-}
-
-void setAuthorAvatarURL( String author_avatar_url ) {
-  env.SLACK_AUTHOR_AVATAR_URL = author_avatar_url
 }
 
 String getDescription() {
@@ -193,15 +165,4 @@ String getPreviousStatus() {
     }
 
     return prev
-}
-
-List<String> getUsersToNotify() {
-    def authors = getChangesAuthorEmails()
-
-    if ( authors.size() == 0 ) {
-        def fallback = getFallbackEmailUserToNotify()
-        authors.add( fallback )
-    }
-
-    return authors
 }

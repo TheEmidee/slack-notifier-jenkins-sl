@@ -20,7 +20,7 @@ class SlackFormatter {
 
         String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
 
-        String author_name = helper.getAuthorName()
+        String author_name = this.config.AuthorName
         if ( author_name != null ) {
             infos += "\n*By : * ${author_name}"
         }
@@ -77,7 +77,6 @@ class SlackFormatter {
     String formatResult( String content_extra_infos = '' ) {
         def helper = new JenkinsHelper()
         def status = new JenkinsStatus()
-        def config = new Config()
 
         def project = helper.getProjectName()
         def branchName = helper.getFullBranchName()
@@ -88,7 +87,7 @@ class SlackFormatter {
 
         String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
 
-        String author_name = helper.getAuthorName()
+        String author_name = this.config.AuthorName
         if ( author_name != null ) {
             infos += "\n*By : * ${author_name}"
         }
@@ -99,11 +98,11 @@ class SlackFormatter {
         def duration = helper.getDuration()
 
         String changes = "*Changes :*\n"
-        if(config.getChangeList()) {
+        if(this.config.ShowChangeList) {
             changes += helper.getChanges().join '\n'
         }
 
-        if (config.getTestSummary()) {
+        if (this.config.ShowTestSummary) {
             JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
             changes += "\n\n" + jenkinsTestsSummary.getTestSummary()
         }

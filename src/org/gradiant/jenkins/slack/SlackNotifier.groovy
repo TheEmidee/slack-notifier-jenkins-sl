@@ -32,8 +32,6 @@ class SlackNotifier {
   }
 
   public void notifyError( Throwable err) {
-    def helper = new JenkinsHelper()
-
     def blocks = this.slackFormatter.formatError err
     this.slackSender.updateMessage( slackResponse, blocks )
 
@@ -41,12 +39,7 @@ class SlackNotifier {
   }
 
   public void notifySuccess() {
-    def helper = new JenkinsHelper()
-    def status = new JenkinsStatus()
-
-    def statusMessage = status.getStatusMessage()
-
-    if(shouldNotNotifySuccess(statusMessage)) {
+    if(shouldNotNotifySuccess()) {
       println("SlackNotifier - No notification will be send for SUCCESS result")
       return
     }
@@ -82,19 +75,22 @@ class SlackNotifier {
       println( "Impossible to notify users. You must pass ( this ) to notifyStart so the script can call slackUserIdFromEmail" )
     }
 
-    def config = new Config()
-
-    if(config.getNotifyUsersWithDirectMessage() == false) {
+    if(this.config.NotifyUsersWithDirectMessage == false) {
       println("SlackNotifier - No direct message will be sent to users")
       return
     }
 
     def status = new JenkinsStatus()
     def helper = new JenkinsHelper()
-
     def status_message = status.getDirectMessage()
+
+    if(this.shouldNotSendDirectMessageOnSuccess()) {
+      println("SlackNotifier - No direct message will be sent to users when the build is successful")
+      return
+    }
+
     def status_color = status.getStatusColor()
-    def users_to_notify = helper.getUsersToNotify()
+    def users_to_notify = this.getUsersToNotify()
 
     for (int i = 0; i < users_to_notify.size(); i++) {
       def user_mail = users_to_notify[i]
@@ -108,8 +104,26 @@ class SlackNotifier {
     }
   }
 
-  private boolean shouldNotNotifySuccess(statusMessage) {
-    def config = new Config()
-    return statusMessage == 'Success' && !config.getNotifySuccess()
+  private boolean shouldNotNotifySuccess() {
+    def status = new JenkinsStatus()
+    return status.hasBeenSuccessful() && !this.config.NotifySuccess
   }
+
+  private boolean shouldNotSendDirectMessageOnSuccess() {
+    def status = new JenkinsStatus()
+    return status.hasBeenSuccessful() && !this.config.NotifyUsersWithDirectMessageOnSuccess
+  }
+
+  private List<String> getUsersToNotify() {
+    def helper = new JenkinsHelper()
+    
+    def authors = helpder.getChangesAuthorEmails()
+
+    if ( authors.size() == 0 ) {
+        def fallback = this.config.FallbackContactEmail
+        authors.add( fallback )
+    }
+
+    return authors
+}
 }
