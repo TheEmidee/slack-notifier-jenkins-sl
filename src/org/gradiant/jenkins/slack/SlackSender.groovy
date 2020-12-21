@@ -3,9 +3,11 @@ package org.gradiant.jenkins.slack
 class SlackSender {
 
   private config = null
+  private Script script = null
 
-  public SlackSender( config ) {
+  public SlackSender( config, Script script ) {
     this.config = config
+    this.script = script
   }
 
   public void sendBlocks( blocks ) {
@@ -27,7 +29,7 @@ class SlackSender {
     println( ts )
     println( blocks.toString() )
 
-    def response = slackSend( channel: channel_id, teamDomain: this.config.SlackDomain, tokenCredentialId: this.config.SlackCredentials, blocks: blocks, timestamp: ts )
+    def response = script.slackSend( channel: channel_id, teamDomain: this.config.SlackDomain, tokenCredentialId: this.config.SlackCredentials, blocks: blocks, timestamp: ts )
     return response
   }
 }

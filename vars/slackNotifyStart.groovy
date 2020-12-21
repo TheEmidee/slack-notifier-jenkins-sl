@@ -2,8 +2,8 @@
 
 import org.gradiant.jenkins.slack.SlackNotifier
 
-def call( config, steps = null ) {
+def call( config, Script script ) {
     // println( "SlackNotifier.instance.notifyStart" )
-    SlackNotifier.instance.initialize( config )
-    return SlackNotifier.instance.notifyStart( steps )
+    SlackNotifier.instance.initialize( config, script )
+    return SlackNotifier.instance.notifyStart()
 }

@@ -3,15 +3,16 @@ package org.gradiant.jenkins.slack
 @Singleton
 class SlackNotifier {
   private slackResponse = null
-  private steps = null
+  private Script script = null
   private String allStages = ''
   private config = null
   private SlackSender slackSender = null
   private SlackFormatter slackFormatter = null
 
-  public void initialize( config ) {
+  public void initialize( config, Script script ) {
     this.config = config
-    this.slackSender = new SlackSender( this.config )
+    this.script = script
+    this.slackSender = new SlackSender( this.config, this.script )
     this.slackFormatter = new SlackFormatter( this.config )
   }
 
@@ -21,9 +22,7 @@ class SlackNotifier {
     return result
   }
 
-  public void notifyStart( steps = null ) {
-    this.steps = steps
-
+  public void notifyStart() {
     def blocks = this.slackFormatter.format 'Build started...'
     this.slackResponse = this.slackSender.sendBlocks blocks
 
@@ -101,7 +100,7 @@ class SlackNotifier {
       def user_mail = users_to_notify[i]
       println( "Notify slack user : ${user_mail}" )
 
-      def user_id = this.steps.slackUserIdFromEmail( user_mail )
+      def user_id = this.script.slackUserIdFromEmail( user_mail )
 
       if ( user_id != null ) {
         this.slackSender.sendDirectMessage( "@${user_id}", status_message, status_color )
