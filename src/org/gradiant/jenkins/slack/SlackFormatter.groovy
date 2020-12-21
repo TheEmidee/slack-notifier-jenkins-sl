@@ -45,7 +45,7 @@ class SlackFormatter {
                 ],
                 "accessory": [
                     "type": "image",
-                    "image_url": env.SLACK_PROJECT_THUMBNAIL,
+                    "image_url": this.config.ProjectThumbnail,
                     "alt_text": "alt text for image"
                 ]
             ],
@@ -135,7 +135,7 @@ class SlackFormatter {
                 ],
                 "accessory": [
                     "type": "image",
-                    "image_url": env.SLACK_PROJECT_THUMBNAIL,
+                    "image_url": this.config.ProjectThumbnail,
                     "alt_text": "alt text for image"
                 ]
             ],

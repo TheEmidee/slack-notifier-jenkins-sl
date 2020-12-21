@@ -7,16 +7,16 @@ class SlackNotifier {
   private String allStages = ''
   private config = null
   private SlackSender slackSender = null
+  private SlackFormatter slackFormatter = null
 
   public void initialize( config ) {
     this.config = config
     this.slackSender = new SlackSender( this.config )
+    this.slackFormatter = new SlackFormatter( this.config )
   }
 
   public void notifyMessage( String custom_message ) {
-    def formatter = new SlackFormatter()
-
-    def blocks = formatter.format custom_message
+    def blocks = this.slackFormatter.format custom_message
     def result = this.slackSender.sendBlocks blocks
     return result
   }
@@ -24,9 +24,7 @@ class SlackNotifier {
   public void notifyStart( steps = null ) {
     this.steps = steps
 
-    def formatter = new SlackFormatter()
-
-    def blocks = formatter.format 'Build started...'
+    def blocks = this.slackFormatter.format 'Build started...'
     this.slackResponse = this.slackSender.sendBlocks blocks
 
     this.allStages = ''
@@ -35,10 +33,9 @@ class SlackNotifier {
   }
 
   public void notifyError( Throwable err) {
-    def formatter = new SlackFormatter()
     def helper = new JenkinsHelper()
 
-    def blocks = formatter.formatError err
+    def blocks = this.slackFormatter.formatError err
     this.slackSender.updateMessage( slackResponse, blocks )
 
     notifyUsers()
@@ -46,7 +43,6 @@ class SlackNotifier {
 
   public void notifySuccess() {
     def helper = new JenkinsHelper()
-    def formatter = new SlackFormatter()
     def status = new JenkinsStatus()
 
     def statusMessage = status.getStatusMessage()
@@ -56,7 +52,7 @@ class SlackNotifier {
       return
     }
 
-    def blocks = formatter.formatSuccess()
+    def blocks = this.slackFormatter.formatSuccess()
     this.slackSender.updateMessage( slackResponse, blocks )
 
     notifyUsers()
@@ -69,14 +65,12 @@ class SlackNotifier {
   }
 
   public void notifyStage( String stage_name ) {
-    def formatter = new SlackFormatter()
-
     if ( this.allStages != null && this.allStages != '' ) {
       this.allStages += " :heavy_check_mark: \n"
     }
     this.allStages += "* ${stage_name}"
 
-    def blocks = formatter.format this.allStages
+    def blocks = this.slackFormatter.format this.allStages
     this.slackSender.updateMessage( slackResponse, blocks )
   }
 
