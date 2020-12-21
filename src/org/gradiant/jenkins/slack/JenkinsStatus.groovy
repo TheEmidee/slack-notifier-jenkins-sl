@@ -67,7 +67,7 @@ String getStatusColor() {
 
 String getDirectMessage() {
   def helper = new JenkinsHelper()
-  def config = new Config()
+  //def config = new Config()
 
   def full_branch_name = helper.getFullBranchName()
   def job_url = helper.getAbsoluteUrl()
@@ -85,7 +85,7 @@ String getDirectMessage() {
     return "Psssst ! Sorry to disturb you...\nI'm just letting you know that the Jenkins job ${mrkdwn} has failed :cry:\n(Don't worry, that stays between us :shushing_face:)"
   }
 
-  if (hasBeenSuccessful() && config.getNotifyUsersWithDirectMessageOnSuccess() ) {
+  if (hasBeenSuccessful() /*&& config.getNotifyUsersWithDirectMessageOnSuccess()*/ ) {
     return "Good job buddy !\nThe Jenkins job ${mrkdwn} has been successful ! :sunglasses:"
   }
 
