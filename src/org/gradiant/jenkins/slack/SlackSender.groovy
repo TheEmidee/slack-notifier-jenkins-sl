@@ -11,7 +11,7 @@ class SlackSender {
   }
 
   public void sendBlocks( blocks ) {
-    return this.send( this.config.SlackChannel, blocks )
+    return this.send( this.config.Channel, blocks )
   }
 
   public void updateMessage( slackResponse, blocks ) {
