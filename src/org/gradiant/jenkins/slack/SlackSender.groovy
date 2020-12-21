@@ -21,18 +21,7 @@ class SlackSender {
   }
 
   private void send( channel_id, blocks, timestamp = null ) {
-    def options = [
-      channel: channel_id, 
-      teamDomain: this.config.SlackDomain, 
-      tokenCredentialId: this.config.SlackCredentials, 
-      blocks: blocks, 
-    ]
-
-    if ( timestamp != null ) {
-      options.timestamp = timestamp
-    }
-
-    def response = slackSend options
+    def response = slackSend( channel: channel_id, teamDomain: this.config.SlackDomain, tokenCredentialId: this.config.SlackCredentials, blocks: blocks, timestamp = timestamp )
     return response
   }
 }
