@@ -19,17 +19,11 @@ class SlackSender {
   }
 
   public void sendDirectMessage( String user_id, String message, String color ) {
-    slackSend( channel: user_id, color: color, message: message )
+    this.slackSend( channel: user_id, color: color, message: message )
   }
 
   private void send( channel_id, blocks, ts = null ) {
-    println( channel_id )
-    println( this.config.SlackDomain )
-    println( this.config.SlackCredentials )
-    println( ts )
-    println( blocks.toString() )
-
-    def response = script.slackSend( channel: channel_id, teamDomain: this.config.SlackDomain, tokenCredentialId: this.config.SlackCredentials, blocks: blocks, timestamp: ts )
+    def response = this.script.slackSend( channel: channel_id, teamDomain: this.config.SlackDomain, tokenCredentialId: this.config.SlackCredentials, blocks: blocks, timestamp: ts )
     return response
   }
 }
