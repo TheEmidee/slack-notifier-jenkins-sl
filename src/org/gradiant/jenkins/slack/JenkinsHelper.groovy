@@ -8,10 +8,6 @@ String getNodeName() {
     return result
 }
 
-String getCurrentStep() {
-    return env.SLACK_CURRENT_STEP
-}
-
 String getDescription() {
     if ( currentBuild.description == null ) {
         return "No Description"

@@ -191,8 +191,10 @@ class SlackFormatter {
     public String formatError( Throwable error ) {
         String extra_infos = ''
 
-        if ( env.SLACK_CURRENT_STEP != null ) {
-            extra_infos += "\nwhile executing ${env.SLACK_CURRENT_STEP}"
+        String current_stage = SlackNotifier.instance.getCurrentStage()
+
+        if ( current_stage != "" ) {
+            extra_infos += "\nwhile executing ${current_stage}"
         }
 
         extra_infos += "\nError: `${error}`"

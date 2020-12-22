@@ -8,6 +8,7 @@ class SlackNotifier {
   private config = null
   private SlackSender slackSender = null
   private SlackFormatter slackFormatter = null
+  String currentStage = ""
 
   public void initialize( config, Script script ) {
     this.config = config
@@ -57,6 +58,8 @@ class SlackNotifier {
   }
 
   public void notifyStage( String stage_name ) {
+    this.currentStage = stage_name
+
     if ( this.allStages != null && this.allStages != '' ) {
       this.allStages += " :heavy_check_mark: \n"
     }
