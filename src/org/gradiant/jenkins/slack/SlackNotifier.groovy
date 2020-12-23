@@ -34,19 +34,31 @@ class SlackNotifier {
 
   public void notifyError( Throwable err) {
     def blocks = this.slackFormatter.formatError err
+    
+    this.script.echo "SlackNotifier - Update message with error"
+    println("SlackNotifier - Update message with error")
     this.slackSender.updateMessage( slackResponse, blocks )
 
+    this.script.echo "SlackNotifier - Notify users"
+    println("SlackNotifier - Notify users")
     notifyUsers()
   }
 
   public void notifySuccess() {
     if(shouldNotNotifySuccess()) {
+      this.script.echo "SlackNotifier - No notification will be send for SUCCESS result"
       println("SlackNotifier - No notification will be send for SUCCESS result")
       return
     }
 
     def blocks = this.slackFormatter.formatSuccess()
+    
+    this.script.echo "SlackNotifier - Update message with success"
+    println("SlackNotifier - Update message with success")
     this.slackSender.updateMessage( slackResponse, blocks )
+
+    this.script.echo "SlackNotifier - Notify users"
+    println("SlackNotifier - Notify users")
 
     notifyUsers()
 
@@ -75,10 +87,12 @@ class SlackNotifier {
 
   public void notifyUsers() {
     if ( this.script == null ) {
+      this.script.echo  "Impossible to notify users. You must pass ( this ) to notifyStart so the script can call slackUserIdFromEmail" 
       println( "Impossible to notify users. You must pass ( this ) to notifyStart so the script can call slackUserIdFromEmail" )
     }
 
     if(this.config.NotifyUsersWithDirectMessage == false) {
+      this.script.echo "SlackNotifier - No direct message will be sent to users"
       println("SlackNotifier - No direct message will be sent to users")
       return
     }
@@ -88,6 +102,7 @@ class SlackNotifier {
     def status_message = status.getDirectMessage()
 
     if(this.shouldNotSendDirectMessageOnSuccess()) {
+      this.script.echo "SlackNotifier - No direct message will be sent to users when the build is successful"
       println("SlackNotifier - No direct message will be sent to users when the build is successful")
       return
     }
@@ -95,10 +110,12 @@ class SlackNotifier {
     def status_color = status.getStatusColor()
     def users_to_notify = this.getUsersToNotify()
 
+    this.script.echo  "Notify ${users_to_notify.size()} users" 
     println( "Notify ${users_to_notify.size()} users" )
 
     for (int i = 0; i < users_to_notify.size(); i++) {
       def user_mail = users_to_notify[i]
+      this.script.echo  "Notify slack user : ${user_mail}" 
       println( "Notify slack user : ${user_mail}" )
 
       def user_id = this.script.slackUserIdFromEmail( user_mail )
@@ -106,6 +123,7 @@ class SlackNotifier {
       if ( user_id != null ) {
         this.slackSender.sendDirectMessage( "@${user_id}", status_message, status_color )
       } else {
+        this.script.echo  "Impossible to get a slack user for ${user_mail}"
         println( "Impossible to get a slack user for ${user_mail}")
       }
     }
