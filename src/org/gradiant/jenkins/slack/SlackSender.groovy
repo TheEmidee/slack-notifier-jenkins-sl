@@ -19,7 +19,7 @@ class SlackSender {
   }
 
   public void sendDirectMessage( String user_id, String message, String color ) {
-    this.slackSend( channel: user_id, color: color, message: message )
+    this.script.slackSend( channel: user_id, color: color, message: message )
   }
 
   private void send( channel_id, blocks, ts = null ) {
