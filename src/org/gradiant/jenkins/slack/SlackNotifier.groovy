@@ -95,6 +95,8 @@ class SlackNotifier {
     def status_color = status.getStatusColor()
     def users_to_notify = this.getUsersToNotify()
 
+    println( "Notify ${users_to_notify.size()} users" )
+
     for (int i = 0; i < users_to_notify.size(); i++) {
       def user_mail = users_to_notify[i]
       println( "Notify slack user : ${user_mail}" )
@@ -103,6 +105,8 @@ class SlackNotifier {
 
       if ( user_id != null ) {
         this.slackSender.sendDirectMessage( "@${user_id}", status_message, status_color )
+      } else {
+        println( "Impossible to get a slack user for ${user_mail}")
       }
     }
   }
