@@ -155,8 +155,8 @@ class SlackNotifier {
   @NonCPS
   private List<String> getChangesAuthorEmails() {
     List<String> authors = []
-    for (int i = 0; i < currentBuild.changeSets.size(); i++) {
-        def entries = currentBuild.changeSets[i].items
+    for (int i = 0; i < this.script.currentBuild.changeSets.size(); i++) {
+        def entries = this.script.currentBuild.changeSets[i].items
         for (int j = 0; j < entries.length; j++) {
             def entry = entries[j]
             def author = entry.author.toString()
