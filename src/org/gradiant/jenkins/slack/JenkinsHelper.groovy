@@ -29,18 +29,6 @@ String getBranchName() {
     return result
 }
 
-String getFullBranchName() {
-    String result = ""
-
-    if ( env.PULL_REQUEST_TITLE != null ) {
-        result = env.PULL_REQUEST_TITLE + " | "
-    }
-
-    result += getBranchName()
-
-    return result
-}
-
 boolean isMultibranch() {
     return getBranchName() != null
 }
@@ -125,24 +113,6 @@ List<String> getChanges() {
     }
 
     return messages
-}
-
-@NonCPS
-List<String> getChangesAuthorEmails() {
-    List<String> authors = []
-    for (int i = 0; i < currentBuild.changeSets.size(); i++) {
-        def entries = currentBuild.changeSets[i].items
-        for (int j = 0; j < entries.length; j++) {
-            def entry = entries[j]
-            def author = entry.author.toString()
-            def email = "${author}@${env.SLACK_MAIL_DOMAIN}"
-            if ( !authors.contains( email ) ) {
-                authors.add( email )
-            }
-        }
-    }
-
-    return authors
 }
 
 String getDuration() {

@@ -150,5 +150,23 @@ class SlackNotifier {
     }
 
     return authors
-}
+  }
+
+  @NonCPS
+  private List<String> getChangesAuthorEmails() {
+    List<String> authors = []
+    for (int i = 0; i < currentBuild.changeSets.size(); i++) {
+        def entries = currentBuild.changeSets[i].items
+        for (int j = 0; j < entries.length; j++) {
+            def entry = entries[j]
+            def author = entry.author.toString()
+            def email = "${author}@${this.config.MailDomain}"
+            if ( !authors.contains( email ) ) {
+                authors.add( email )
+            }
+        }
+    }
+
+    return authors
+  }
 }

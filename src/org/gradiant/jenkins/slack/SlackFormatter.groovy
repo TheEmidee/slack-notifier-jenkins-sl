@@ -12,7 +12,7 @@ class SlackFormatter {
         def helper = new JenkinsHelper()
 
         def project = helper.getProjectName()
-        def branchName = helper.getFullBranchName()
+        def branchName = helper.getBranchName()
         def buildNumber = helper.getBuildNumber()
         def url = helper.getAbsoluteUrl()
         def nodeName = helper.getNodeName()
@@ -79,7 +79,7 @@ class SlackFormatter {
         def status = new JenkinsStatus()
 
         def project = helper.getProjectName()
-        def branchName = helper.getFullBranchName()
+        def branchName = helper.getBranchName()
         def buildNumber = helper.getBuildNumber()
         def url = helper.getAbsoluteUrl()
         def nodeName = helper.getNodeName()

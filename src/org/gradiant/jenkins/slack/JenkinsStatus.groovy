@@ -69,7 +69,7 @@ String getDirectMessage() {
   def helper = new JenkinsHelper()
   //def config = new Config()
 
-  def full_branch_name = helper.getFullBranchName()
+  def full_branch_name = helper.getBranchName()
   def job_url = helper.getAbsoluteUrl()
   def mrkdwn = "<${job_url}|${full_branch_name}>"
 
