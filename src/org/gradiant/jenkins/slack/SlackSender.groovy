@@ -1,38 +1,29 @@
 package org.gradiant.jenkins.slack
 
-void sendBlocks(blocks) {
-  return slackSend( channel: env.SLACK_CHANNEL, teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks )
-}
+class SlackSender {
 
-void updateMessage( slackResponse, blocks ) {
-  slackSend( channel: slackResponse.channelId, teamDomain: env.SLACK_DOMAIN, tokenCredentialId: env.SLACK_CREDENTIALS, blocks: blocks, timestamp: slackResponse.ts )
-}
+  private config = null
+  private Script script = null
 
-void sendMessage(String message) {
-  options = getOptions( message )
-  slackSend options
-}
-
-def getOptions(String message = '', String color = '') {
-  def obj = [
-    message: message
-  ]
-
-  if (color) {
-    obj.color = color
+  public SlackSender( config, Script script ) {
+    this.config = config
+    this.script = script
   }
 
-  if (env.SLACK_CHANNEL) {
-    obj.channel = env.SLACK_CHANNEL
+  public void sendBlocks( blocks ) {
+    return this.send( this.config.Channel, blocks )
   }
 
-  if (env.SLACK_DOMAIN) {
-    obj.teamDomain = env.SLACK_DOMAIN
+  public void updateMessage( slackResponse, blocks ) {
+    this.send( slackResponse.channelId, blocks, slackResponse.ts )
   }
 
-  if (env.SLACK_CREDENTIALS) {
-    obj.tokenCredentialId = env.SLACK_CREDENTIALS
+  public void sendDirectMessage( String user_id, String message, String color ) {
+    this.script.slackSend( channel: user_id, color: color, message: message )
   }
 
-  return obj
+  private void send( channel_id, blocks, ts = null ) {
+    def response = this.script.slackSend( channel: channel_id, teamDomain: this.config.SlackDomain, tokenCredentialId: this.config.SlackCredentials, blocks: blocks, timestamp: ts )
+    return response
+  }
 }

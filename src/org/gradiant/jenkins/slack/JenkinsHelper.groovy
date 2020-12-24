@@ -8,38 +8,6 @@ String getNodeName() {
     return result
 }
 
-String getFallbackEmailUserToNotify() {
-    return env.SLACK_FALLBACK_USER_TO_NOTIFY
-}
-
-void setFallbackEmailUserToNotify( String user_email ) {
-  env.SLACK_FALLBACK_USER_TO_NOTIFY = user_email
-}
-
-String getCurrentStep() {
-    return env.SLACK_CURRENT_STEP
-}
-
-void setCurrentStep( String current_step ) {
-  env.SLACK_CURRENT_STEP = current_step
-}
-
-String getAuthorName() {
-    return env.SLACK_AUTHOR_NAME
-}
-
-void setAuthorName( String author_name ) {
-  env.SLACK_AUTHOR_NAME = author_name
-}
-
-String getAuthorAvatarURL() {
-    return env.SLACK_AUTHOR_AVATAR_URL
-}
-
-void setAuthorAvatarURL( String author_avatar_url ) {
-  env.SLACK_AUTHOR_AVATAR_URL = author_avatar_url
-}
-
 String getDescription() {
     if ( currentBuild.description == null ) {
         return "No Description"
@@ -58,18 +26,6 @@ String getBranchName() {
         result = env.GIT_BRANCH
     }
     
-    return result
-}
-
-String getFullBranchName() {
-    String result = ""
-
-    if ( env.PULL_REQUEST_TITLE != null ) {
-        result = env.PULL_REQUEST_TITLE + " | "
-    }
-
-    result += getBranchName()
-
     return result
 }
 
@@ -159,24 +115,6 @@ List<String> getChanges() {
     return messages
 }
 
-@NonCPS
-List<String> getChangesAuthorEmails() {
-    List<String> authors = []
-    for (int i = 0; i < currentBuild.changeSets.size(); i++) {
-        def entries = currentBuild.changeSets[i].items
-        for (int j = 0; j < entries.length; j++) {
-            def entry = entries[j]
-            def author = entry.author.toString()
-            def email = "${author}@${env.SLACK_MAIL_DOMAIN}"
-            if ( !authors.contains( email ) ) {
-                authors.add( email )
-            }
-        }
-    }
-
-    return authors
-}
-
 String getDuration() {
     return currentBuild.durationString.replace(' and counting', '')
 }
@@ -193,15 +131,4 @@ String getPreviousStatus() {
     }
 
     return prev
-}
-
-List<String> getUsersToNotify() {
-    def authors = getChangesAuthorEmails()
-
-    if ( authors.size() == 0 ) {
-        def fallback = getFallbackEmailUserToNotify()
-        authors.add( fallback )
-    }
-
-    return authors
 }
