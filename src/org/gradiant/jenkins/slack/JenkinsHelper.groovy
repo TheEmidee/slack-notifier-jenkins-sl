@@ -22,7 +22,7 @@ String getBranchName() {
         result = env.BRANCH_NAME
     }
 
-    if ( result == "" ) {
+    if ( result == "" || result == null ) {
         result = env.GIT_BRANCH
     }
     
