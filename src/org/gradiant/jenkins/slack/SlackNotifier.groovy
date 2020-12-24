@@ -99,7 +99,7 @@ class SlackNotifier {
 
     def status = new JenkinsStatus()
     def helper = new JenkinsHelper()
-    def status_message = status.getDirectMessage()
+    def status_message = this.getDirectMessage()
 
     if(this.shouldNotSendDirectMessageOnSuccess()) {
       this.script.echo "SlackNotifier - No direct message will be sent to users when the build is successful"
@@ -127,6 +127,37 @@ class SlackNotifier {
         println( "Impossible to get a slack user for ${user_mail}")
       }
     }
+  }
+
+  private String getDirectMessage() {
+    def helper = new JenkinsHelper()
+    def status = new JenkinsStatus()
+
+    def full_branch_name = helper.getBranchName()
+    def job_url = helper.getAbsoluteUrl()
+    def mrkdwn = "<${job_url}|${full_branch_name}>"
+
+    if (status.isBackToNormal()) {
+        return sprintf( this.config.DirectMessages.BackToNormal, mrkdwn )
+    }
+
+    if (status.stillFailing()) {
+        return sprintf( this.config.DirectMessages.StillFailing, mrkdwn )
+    }
+
+    if (status.hasFailed()) {
+        return sprintf( this.config.DirectMessages.Failed, mrkdwn )
+    }
+
+    if (status.hasBeenSuccessful()) {
+        return sprintf( this.config.DirectMessages.Successful, mrkdwn )
+    }
+
+    if (status.isUnstable()) {
+        return sprintf( this.config.DirectMessages.Unstable, mrkdwn )
+    }
+
+    return ''
   }
 
   private boolean shouldNotNotifySuccess() {

@@ -94,7 +94,7 @@ class SlackFormatter {
 
         infos += "\n<${url}|Open>"
 
-        def statusMessage = status.getStatusMessage()
+        def statusMessage = this.getStatusMessage()
         def duration = helper.getDuration()
 
         String changes = "*Changes :*\n"
@@ -201,5 +201,31 @@ class SlackFormatter {
 
         def blocks = formatResult extra_infos
         return blocks
+    }
+
+    private String getStatusMessage() {
+        def status = new JenkinsStatus()
+
+        if (status.isBackToNormal()) {
+            return this.config.StatusMessages.BackToNormal
+        }
+
+        if (status.stillFailing()) {
+            return this.config.StatusMessages.StillFailing
+        }
+
+        if (status.hasFailed()) {
+            return this.config.StatusMessages.Failed
+        }
+
+        if (status.hasBeenSuccessful()) {
+            return this.config.StatusMessages.Successful
+        }
+
+        if (status.isUnstable()) {
+            return this.config.StatusMessages.Unstable
+        }
+
+        return ''
     }
 }
