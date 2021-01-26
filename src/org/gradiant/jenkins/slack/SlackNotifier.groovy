@@ -24,7 +24,9 @@ class SlackNotifier {
   }
 
   public void notifyStart() {
+    println("Slack Sender: Notify start")
     def blocks = this.slackFormatter.format 'Build started...'
+    println("Blocks: $blocks")
     this.slackResponse = this.slackSender.sendBlocks blocks
 
     this.allStages = ''
@@ -162,12 +164,12 @@ class SlackNotifier {
 
   private boolean shouldNotNotifySuccess() {
     def status = new JenkinsStatus()
-    return status.hasBeenSuccessful() && !this.config.NotifySuccess
+    return status.hasBeenSuccessful() && this.config.NotifySuccess != true
   }
 
   private boolean shouldNotSendDirectMessageOnSuccess() {
     def status = new JenkinsStatus()
-    return status.hasBeenSuccessful() && !this.config.NotifyUsersWithDirectMessageOnSuccess
+    return status.hasBeenSuccessful() && this.config.NotifyUsersWithDirectMessageOnSuccess != true
   }
 
   private List<String> getUsersToNotify() {

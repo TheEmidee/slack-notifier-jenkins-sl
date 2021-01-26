@@ -9,11 +9,9 @@ class SlackFormatter {
     }
 
     public String format(String content = '') {
-
         def description_block = getOptionalDescriptionBlock()
 
-        def content_block = 
-        [
+        def content_block = [
             "type": "section",
             "text": 
             [
@@ -22,8 +20,7 @@ class SlackFormatter {
             ]
         ]
 
-        def blocks = 
-        [
+        def blocks = [
             getHeaderBlock(),
             getProjectInfoBlock(),
             getDividerBlock()
@@ -34,7 +31,7 @@ class SlackFormatter {
             blocks.add(getDividerBlock())
         }
 
-        blocks.add(content)
+        blocks.add(content_block)
 
         return blocks
     }
@@ -42,8 +39,7 @@ class SlackFormatter {
     String formatResult( String content_extra_infos = '' ) {
         def description_block = getOptionalDescriptionBlock()
 
-        def blocks = 
-        [
+        def blocks = [
             getHeaderBlock(),
             getProjectInfoBlock(),
             getDividerBlock()
@@ -54,7 +50,7 @@ class SlackFormatter {
             blocks.add(getDividerBlock())
         }
 
-        blocks.add([
+        blocks.addAll(
             getResultContentBlock(content_extra_infos),
             getDividerBlock(),
             getRelevantLinksBlock(),
@@ -114,8 +110,7 @@ class SlackFormatter {
     private getHeaderBlock() {
         def helper = new JenkinsHelper()
         def project = helper.getProjectName()
-        return 
-        [
+        return [
             "type": "header",
             "text": 
             [
@@ -134,16 +129,16 @@ class SlackFormatter {
         def nodeName = helper.getNodeName()
         def url = helper.getAbsoluteUrl()
 
-        String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
+        String infos = "*Branch name:* ${branchName}\n*Build Number:* #${buildNumber}\n*Node name:* ${nodeName}"
 
         String platform_name = this.config.PlatformName
         if ( platform_name != null ) {
-            infos += "\n*Platform: ${platform_name}"
+            infos += "\n*Platform:* ${platform_name}"
         }
 
         String author_name = this.config.AuthorName
         if ( author_name != null ) {
-            infos += "\n*By : * ${author_name}"
+            infos += "\n*By: * ${author_name}"
         }
 
         infos += "\n<${url}|Open>"
@@ -171,8 +166,7 @@ class SlackFormatter {
     }
 
     private getDividerBlock() {
-        return 
-        [
+        return [
             "type": "divider"
         ]
     }
@@ -181,8 +175,7 @@ class SlackFormatter {
         def helper = new JenkinsHelper()
         def description = helper.getDescription()
         if (description != null) {
-            return
-            [
+            return [
                 "type": "section",
                 "text": 
                 [
@@ -201,8 +194,7 @@ class SlackFormatter {
 
         def content = "${statusMessage} after ${duration}"
         content = content + content_extra_infos
-        return
-        [
+        return [
                 "type": "section",
                 "text": [
                     "type": "mrkdwn",
@@ -236,8 +228,7 @@ class SlackFormatter {
 
         relevant_links += " - [ <${rebuildUrl}|Rebuild Job> ]"
 
-        return
-        [
+        return [
             "type": "section",
             "text": 
             [
@@ -254,13 +245,12 @@ class SlackFormatter {
             changes += helper.getChanges().join '\n'
         }
 
-        if (this.config.ShowTestSummary) {
+        if (this.config.ShowTestSummary == true) {
             JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
             changes += "\n\n" + jenkinsTestsSummary.getTestSummary()
         }
 
-        return
-        [
+        return [
             "type": "section",
             "text": 
             [
