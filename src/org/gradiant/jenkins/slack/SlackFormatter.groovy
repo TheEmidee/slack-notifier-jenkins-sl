@@ -9,176 +9,58 @@ class SlackFormatter {
     }
 
     public String format(String content = '') {
-        def helper = new JenkinsHelper()
 
-        def project = helper.getProjectName()
-        def branchName = helper.getBranchName()
-        def buildNumber = helper.getBuildNumber()
-        def url = helper.getAbsoluteUrl()
-        def nodeName = helper.getNodeName()
-        def description = helper.getDescription()
+        def description_block = getOptionalDescriptionBlock()
 
-        String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
-
-        String author_name = this.config.AuthorName
-        if ( author_name != null ) {
-            infos += "\n*By : * ${author_name}"
-        }
-
-        infos += "\n<${url}|Open>"
+        def content_block = 
+        [
+            "type": "section",
+            "text": 
+            [
+                "type": "mrkdwn",
+                "text": content
+            ]
+        ]
 
         def blocks = 
         [
-            [
-                "type": "header",
-                "text": [
-                    "type": "plain_text",
-                    "text": project,
-                    "emoji": true
-                ]
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": infos
-                ],
-                "accessory": [
-                    "type": "image",
-                    "image_url": this.config.ProjectThumbnail,
-                    "alt_text": "alt text for image"
-                ]
-            ],
-            [
-                "type": "divider"
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": "```${description}```"
-                ]
-            ],
-            [
-                "type": "divider"
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": content
-                ]
-            ]
+            getHeaderBlock(),
+            getProjectInfoBlock(),
+            getDividerBlock()
         ]
+
+        if (description_block != null) {
+            blocks.add(description_block)
+            blocks.add(getDividerBlock())
+        }
+
+        blocks.add(content)
 
         return blocks
     }
 
     String formatResult( String content_extra_infos = '' ) {
-        def helper = new JenkinsHelper()
-        def status = new JenkinsStatus()
-
-        def project = helper.getProjectName()
-        def branchName = helper.getBranchName()
-        def buildNumber = helper.getBuildNumber()
-        def url = helper.getAbsoluteUrl()
-        def nodeName = helper.getNodeName()
-        def description = helper.getDescription()
-
-        String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
-
-        String author_name = this.config.AuthorName
-        if ( author_name != null ) {
-            infos += "\n*By : * ${author_name}"
-        }
-
-        infos += "\n<${url}|Open>"
-
-        def statusMessage = this.getStatusMessage()
-        def duration = helper.getDuration()
-
-        String changes = "*Changes :*\n"
-        if(this.config.ShowChangeList) {
-            changes += helper.getChanges().join '\n'
-        }
-
-        if (this.config.ShowTestSummary) {
-            JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
-            changes += "\n\n" + jenkinsTestsSummary.getTestSummary()
-        }
-
-        def content = "${statusMessage} after ${duration}"
-        content = content + content_extra_infos
-
-        def logsUrl = helper.getConsoleLogsUrl()
-        def testsUrl = helper.getTestsResultUrl()
-        def artifactsUrl = helper.getArtifactsUrl()
-        def githubPRUrl = helper.getGitHubPRUrl()
-        def rebuildUrl = helper.getRebuildUrl()
+        def description_block = getOptionalDescriptionBlock()
 
         def blocks = 
         [
-            [
-                "type": "header",
-                "text": [
-                    "type": "plain_text",
-                    "text": project,
-                    "emoji": true
-                ]
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": infos
-                ],
-                "accessory": [
-                    "type": "image",
-                    "image_url": this.config.ProjectThumbnail,
-                    "alt_text": "alt text for image"
-                ]
-            ],
-            [
-                "type": "divider"
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": "```${description}```"
-                ]
-            ],
-            [
-                "type": "divider"
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": content
-                ]
-            ],
-            [
-                "type": "divider"
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": "[ <${logsUrl}|ConsoleLog> ] - [ <${testsUrl}|Test Result> ] - [ <${artifactsUrl}|Artifacts> ] - [ <${githubPRUrl}|GitHub PR> ] - [ <${rebuildUrl}|Rebuild Job> ]",
-                ]
-            ],
-            [
-                "type": "divider"
-            ],
-            [
-                "type": "section",
-                "text": [
-                    "type": "mrkdwn",
-                    "text": changes,
-                ]
-            ]
+            getHeaderBlock(),
+            getProjectInfoBlock(),
+            getDividerBlock()
         ]
+        
+        if ( description_block != null ) {
+            blocks.add(description_block)
+            blocks.add(getDividerBlock())
+        }
+
+        blocks.add([
+            getResultContentBlock(content_extra_infos),
+            getDividerBlock(),
+            getRelevantLinksBlock(),
+            getDividerBlock(),
+            getResultChangesBlock()
+        ])
 
         return blocks
     }
@@ -227,5 +109,164 @@ class SlackFormatter {
         }
 
         return ''
+    }
+
+    private getHeaderBlock() {
+        def helper = new JenkinsHelper()
+        def project = helper.getProjectName()
+        return 
+        [
+            "type": "header",
+            "text": 
+            [
+                "type": "plain_text",
+                "text": project,
+                "emoji": true
+            ]
+        ]
+    }
+
+    private getProjectInfoBlock() {
+        def helper = new JenkinsHelper()
+
+        def branchName = helper.getBranchName()
+        def buildNumber = helper.getBuildNumber()
+        def nodeName = helper.getNodeName()
+        def url = helper.getAbsoluteUrl()
+
+        String infos = "*Branch name : * ${branchName}\n*Build Number : * #${buildNumber}\n*Node name : * ${nodeName}"
+
+        String platform_name = this.config.PlatformName
+        if ( platform_name != null ) {
+            infos += "\n*Platform: ${platform_name}"
+        }
+
+        String author_name = this.config.AuthorName
+        if ( author_name != null ) {
+            infos += "\n*By : * ${author_name}"
+        }
+
+        infos += "\n<${url}|Open>"
+
+        def result = 
+        [
+            "type": "section",
+            "text": [
+                "type": "mrkdwn",
+                "text": infos
+            ]
+        ]
+
+        if ( this.config.ProjectThumbnail != null ) {
+            result = result + [
+                "accessory": [
+                    "type": "image",
+                    "image_url": this.config.ProjectThumbnail,
+                    "alt_text": "project thumbnail"
+                ]
+            ]
+        }
+        
+        return result
+    }
+
+    private getDividerBlock() {
+        return 
+        [
+            "type": "divider"
+        ]
+    }
+
+    private getOptionalDescriptionBlock() {
+        def helper = new JenkinsHelper()
+        def description = helper.getDescription()
+        if (description != null) {
+            return
+            [
+                "type": "section",
+                "text": 
+                [
+                    "type": "mrkdwn",
+                    "text": "```${description}```"
+                ]
+            ]
+        }
+        return null
+    }
+
+    private getResultContentBlock( String content_extra_infos ) {
+        def helper = new JenkinsHelper()
+        def statusMessage = this.getStatusMessage()
+        def duration = helper.getDuration()
+
+        def content = "${statusMessage} after ${duration}"
+        content = content + content_extra_infos
+        return
+        [
+                "type": "section",
+                "text": [
+                    "type": "mrkdwn",
+                    "text": content
+                ]
+        ]
+    }
+
+    private getRelevantLinksBlock() {
+        def helper = new JenkinsHelper()
+        def logsUrl = helper.getConsoleLogsUrl()
+        def githubPRUrl = helper.getGitHubPRUrl()
+        def rebuildUrl = helper.getRebuildUrl()
+
+        String relevant_links = "[ <${logsUrl}|ConsoleLog> ]"
+
+        // be permissive. On by default unless false.
+        if (this.config.Links.TestResults != false) {
+            def testsUrl = helper.getTestsResultUrl()
+            relevant_links +=  "- [ <${testsUrl}|Test Result> ]"
+        }
+
+        if (this.config.Links.Artifacts != false) {
+            def artifactsUrl = helper.getArtifactsUrl()
+            relevant_links += " - [ <${artifactsUrl}|Artifacts> ]"
+        }
+
+        if (githubPRUrl != null) {
+            relevant_links += " - [ <${githubPRUrl}|GitHub PR> ]"
+        }
+
+        relevant_links += " - [ <${rebuildUrl}|Rebuild Job> ]"
+
+        return
+        [
+            "type": "section",
+            "text": 
+            [
+                "type": "mrkdwn",
+                "text": relevant_links
+            ]
+        ]
+    }
+
+    private getResultChangesBlock() {
+        def helper = new JenkinsHelper()
+        String changes = "*Changes :*\n"
+        if(this.config.ShowChangeList) {
+            changes += helper.getChanges().join '\n'
+        }
+
+        if (this.config.ShowTestSummary) {
+            JenkinsTestsSummary jenkinsTestsSummary = new JenkinsTestsSummary()
+            changes += "\n\n" + jenkinsTestsSummary.getTestSummary()
+        }
+
+        return
+        [
+            "type": "section",
+            "text": 
+            [
+                "type": "mrkdwn",
+                "text": changes,
+            ]
+        ]
     }
 }
