@@ -1,5 +1,7 @@
 package org.gradiant.jenkins.slack
 
+import groovy.time.*
+
 @Singleton
 class SlackNotifier {
   private slackResponse = null
@@ -8,6 +10,7 @@ class SlackNotifier {
   private config = null
   private SlackSender slackSender = null
   private SlackFormatter slackFormatter = null
+  private Date previousStageCompletedDate = null
   String currentStage = ""
 
   public void initialize( config, Script script ) {
@@ -34,30 +37,39 @@ class SlackNotifier {
     return this.slackResponse
   }
 
-  public void notifyError( Throwable err) {
+  public void notifyError( Throwable err, _slackResponse = null) {
+    if (_slackResponse == null) {
+      _slackResponse = this.slackResponse
+    }
+
     def blocks = this.slackFormatter.formatError err
     
     this.script.echo "SlackNotifier - Update message with error"
     println("SlackNotifier - Update message with error")
-    this.slackSender.updateMessage( slackResponse, blocks )
+    
+    this.slackSender.updateMessage( _slackResponse, blocks )
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
     notifyUsers()
   }
 
-  public void notifySuccess() {
+  public void notifySuccess( _slackResponse = null ) {
     if(shouldNotNotifySuccess()) {
       this.script.echo "SlackNotifier - No notification will be send for SUCCESS result"
       println("SlackNotifier - No notification will be send for SUCCESS result")
       return
     }
 
+    if (_slackResponse == null) {
+      _slackResponse = this.slackResponse
+    }
+
     def blocks = this.slackFormatter.formatSuccess()
     
     this.script.echo "SlackNotifier - Update message with success"
     println("SlackNotifier - Update message with success")
-    this.slackSender.updateMessage( slackResponse, blocks )
+    this.slackSender.updateMessage( _slackResponse, blocks )
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
@@ -71,20 +83,33 @@ class SlackNotifier {
     // }
   }
 
-  public void notifyStage( String stage_name ) {
+  public void notifyStage( String stage_name, _slackResponse = null ) {
+    if (_slackResponse == null) {
+      _slackResponse = this.slackResponse
+    }
+
     this.currentStage = stage_name
 
     if ( this.allStages != null && this.allStages != '' ) {
-      this.allStages += " :heavy_check_mark: \n"
+      def currentStageCompletedDate = new Date()
+      TimeDuration duration = TimeCategory.minus(currentStageCompletedDate, previousStageCompletedDate)
+      previousStageCompletedDate = currentStageCompletedDate
+      this.allStages += " ($duration) :heavy_check_mark: \n"
+    } else {
+      previousStageCompletedDate = new Date()
     }
     this.allStages += "* ${stage_name}"
 
     def blocks = this.slackFormatter.format this.allStages
-    this.slackSender.updateMessage( slackResponse, blocks )
+    this.slackSender.updateMessage( _slackResponse, blocks )
   }
 
-  public void uploadFileToMessage( filePath, String comment = '' ) {
-    slackUploadFile( channel: slackResponse.channelId + ":" + slackResponse.ts, filePath: filePath, initialComment: comment )
+  public void uploadFileToMessage( filePath, String comment = '', _slackResponse = null ) {
+    if (_slackResponse == null) {
+      _slackResponse = this.slackResponse
+    }
+
+    slackUploadFile( channel: _slackResponse.channelId + ":" + _slackResponse.ts, filePath: filePath, initialComment: comment )
   }
 
   public void notifyUsers() {

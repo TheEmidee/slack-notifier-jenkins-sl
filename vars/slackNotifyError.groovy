@@ -2,6 +2,6 @@
 
 import org.gradiant.jenkins.slack.SlackNotifier
 
-def call( Throwable err ) {
-    SlackNotifier.instance.notifyError( err )
+def call( Throwable err, slackResponse = null ) {
+    SlackNotifier.instance.notifyError( err, slackResponse )
 }

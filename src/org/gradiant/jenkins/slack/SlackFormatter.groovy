@@ -50,7 +50,7 @@ class SlackFormatter {
             blocks.add(getDividerBlock())
         }
 
-        blocks.addAll(
+        blocks.addAll([
             getResultContentBlock(content_extra_infos),
             getDividerBlock(),
             getRelevantLinksBlock(),

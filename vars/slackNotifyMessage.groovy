@@ -2,7 +2,7 @@
 
 import org.gradiant.jenkins.slack.SlackNotifier
 
-def call( String message ) {
+def call( String message, slackResponse = null ) {
     // println( "SlackNotifier.instance.notifySuccess" )
-    SlackNotifier.instance.notifyMessage( message )
+    SlackNotifier.instance.notifyMessage( message, slackResponse )
 }
