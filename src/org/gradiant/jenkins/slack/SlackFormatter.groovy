@@ -52,7 +52,7 @@ class SlackFormatter {
 
         data.each { id, node ->
             if (node.status != null) {
-                blocks.add(getResultContentBlock(node.status, node.errorInfo))
+                blocks.add(getResultContentBlock(node))
             } else {
                 def content_block = [
                     "type": "section",
@@ -187,13 +187,14 @@ class SlackFormatter {
         return null
     }
 
-    private getResultContentBlock( JenkinsStatus status, String content_extra_infos ) {
+    private getResultContentBlock( SlackMessageData node_data ) {
         def helper = new JenkinsHelper()
         def duration = helper.getDuration()
-        def statusMessage = status.getStatusMessage(config)
+        def statusMessage = node_data.status.getStatusMessage(config)
 
-        def content = "${statusMessage} after ${duration}"
-        content = content + content_extra_infos
+        def content = "*Node name: * ${node_data.nodeName}\n"
+        content += "${statusMessage} after ${duration}"
+        content = content + node_data.errorInfo
         return [
                 "type": "section",
                 "text": [
