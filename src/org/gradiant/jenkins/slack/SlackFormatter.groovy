@@ -131,11 +131,6 @@ class SlackFormatter {
 
         String infos = "*Branch name:* ${branchName}\n*Build Number:* #${buildNumber}\n*Node name:* ${nodeName}"
 
-        String platform_name = this.config.PlatformName
-        if ( platform_name != null ) {
-            infos += "\n*Platform:* ${platform_name}"
-        }
-
         String author_name = this.config.AuthorName
         if ( author_name != null ) {
             infos += "\n*By: * ${author_name}"
@@ -209,7 +204,7 @@ class SlackFormatter {
         def githubPRUrl = helper.getGitHubPRUrl()
         def rebuildUrl = helper.getRebuildUrl()
 
-        String relevant_links = "[ <${logsUrl}|ConsoleLog> ]"
+        String relevant_links = "[ <${logsUrl}|Console Log> ]"
 
         // be permissive. On by default unless false.
         if (this.config.Links.TestResults != false) {
