@@ -55,8 +55,10 @@ class SlackFormatter {
         }
 
         if (finished) {
+            def helper = new JenkinsHelper()
+
             blocks.addAll([
-                getResultContentBlock(node),
+                getResultContentBlock(data[helper.getNodeName()]),
                 getRelevantLinksBlock(),
                 getDividerBlock(),
                 getResultChangesBlock()
@@ -189,8 +191,7 @@ class SlackFormatter {
         def duration = helper.getDuration()
         def statusMessage = node_data.status.getStatusMessage(config)
 
-        def content = "*Node name: * ${node_data.nodeName}\n"
-        content += "${statusMessage} after ${duration}"
+        def content = "${statusMessage} after ${duration}"
         content = content + node_data.errorInfo
         return [
                 "type": "section",

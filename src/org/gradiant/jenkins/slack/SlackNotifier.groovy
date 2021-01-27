@@ -43,7 +43,8 @@ class SlackNotifier {
     return this.slackResponse
   }
 
-  public void notifyError( Throwable err) {
+  public void notifyError( Throwable err ) {
+
     def blocks = this.slackFormatter.formatError( err, messageData )
     
     this.script.echo "SlackNotifier - Update message with error"
@@ -58,6 +59,7 @@ class SlackNotifier {
   }
 
   public void notifySuccess() {
+
     if(shouldNotNotifySuccess()) {
       this.script.echo "SlackNotifier - No notification will be send for SUCCESS result"
       println("SlackNotifier - No notification will be send for SUCCESS result")
@@ -66,6 +68,7 @@ class SlackNotifier {
     def helper = new JenkinsHelper()
     def data = messageData[helper.getNodeName()]
     data.status = new JenkinsStatus()
+    messageData[data.nodeName] = data
 
     def blocks = this.slackFormatter.formatMultipleNodes messageData
     
