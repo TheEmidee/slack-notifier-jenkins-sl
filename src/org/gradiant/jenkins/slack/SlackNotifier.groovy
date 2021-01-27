@@ -6,12 +6,10 @@ import groovy.time.*
 class SlackNotifier {
   private slackResponse = null
   private Script script = null
-  private String allStages = ''
   private config = null
   private SlackSender slackSender = null
   private SlackFormatter slackFormatter = null
-  private Date previousStageCompletedDate = null
-  String currentStage = ""
+  def messageData = [:]
 
   public void initialize( config, Script script ) {
     this.config = config
@@ -32,7 +30,7 @@ class SlackNotifier {
     println("Blocks: $blocks")
     this.slackResponse = this.slackSender.sendBlocks blocks
 
-    this.allStages = ''
+    messageData[this.slackResponse.ts:new SlackMessageData()]
 
     return this.slackResponse
   }
@@ -88,20 +86,22 @@ class SlackNotifier {
       _slackResponse = this.slackResponse
     }
 
-    this.currentStage = stage_name
+    var data = messageData[_slackResponse.ts]
+    data.currentStage = stage_name
 
-    if ( this.allStages != null && this.allStages != '' ) {
+    if ( data.allStages != null && data.allStages != '' ) {
       def currentStageCompletedDate = new Date()
-      TimeDuration duration = TimeCategory.minus(currentStageCompletedDate, previousStageCompletedDate)
-      previousStageCompletedDate = currentStageCompletedDate
-      this.allStages += " ($duration) :heavy_check_mark: \n"
+      TimeDuration duration = TimeCategory.minus(currentStageCompletedDate, data.previousStageCompletedDate)
+      data.previousStageCompletedDate = currentStageCompletedDate
+      data.allStages += " ($duration) :heavy_check_mark: \n"
     } else {
-      previousStageCompletedDate = new Date()
+      data.previousStageCompletedDate = new Date()
     }
-    this.allStages += "* ${stage_name}"
+    data.allStages += "* ${stage_name}"
 
-    def blocks = this.slackFormatter.format this.allStages
+    def blocks = this.slackFormatter.format data.allStages
     this.slackSender.updateMessage( _slackResponse, blocks )
+    messageData[_slackResponse.ts] = data
   }
 
   public void uploadFileToMessage( filePath, String comment = '', _slackResponse = null ) {
