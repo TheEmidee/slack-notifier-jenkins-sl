@@ -41,39 +41,31 @@ class SlackNotifier {
     return this.slackResponse
   }
 
-  public void notifyError( Throwable err, _slackResponse = null) {
-    if (_slackResponse == null) {
-      _slackResponse = this.slackResponse
-    }
-
+  public void notifyError( Throwable err) {
     def blocks = this.slackFormatter.formatError err
     
     this.script.echo "SlackNotifier - Update message with error"
     println("SlackNotifier - Update message with error")
     
-    this.slackSender.updateMessage( _slackResponse, blocks )
+    this.slackSender.updateMessage( this.slackResponse, blocks )
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
     notifyUsers()
   }
 
-  public void notifySuccess( _slackResponse = null ) {
+  public void notifySuccess() {
     if(shouldNotNotifySuccess()) {
       this.script.echo "SlackNotifier - No notification will be send for SUCCESS result"
       println("SlackNotifier - No notification will be send for SUCCESS result")
       return
     }
 
-    if (_slackResponse == null) {
-      _slackResponse = this.slackResponse
-    }
-
     def blocks = this.slackFormatter.formatSuccess()
     
     this.script.echo "SlackNotifier - Update message with success"
     println("SlackNotifier - Update message with success")
-    this.slackSender.updateMessage( _slackResponse, blocks )
+    this.slackSender.updateMessage( this.slackResponse, blocks )
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
@@ -87,10 +79,7 @@ class SlackNotifier {
     // }
   }
 
-  public void notifyStage( String stage_name, _slackResponse = null ) {
-    if (_slackResponse == null) {
-      _slackResponse = this.slackResponse
-    }
+  public void notifyStage( String stage_name ) {
     def helper = new JenkinsHelper()
 
     var data = messageData[helper.getNodeName()]
@@ -108,16 +97,12 @@ class SlackNotifier {
     data.allStages += "• ${stage_name}"
 
     def blocks = this.slackFormatter.formatMultipleNodes data
-    this.slackSender.updateMessage( _slackResponse, blocks )
+    this.slackSender.updateMessage( this.slackResponse, blocks )
     messageData[data.nodeName] = data
   }
 
-  public void uploadFileToMessage( filePath, String comment = '', _slackResponse = null ) {
-    if (_slackResponse == null) {
-      _slackResponse = this.slackResponse
-    }
-
-    slackUploadFile( channel: _slackResponse.channelId + ":" + _slackResponse.ts, filePath: filePath, initialComment: comment )
+  public void uploadFileToMessage( filePath, String comment = '' ) {
+    slackUploadFile( channel: this.slackResponse.channelId + ":" + this.slackResponse.ts, filePath: filePath, initialComment: comment )
   }
 
   public void notifyUsers() {
