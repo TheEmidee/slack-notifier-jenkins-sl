@@ -36,6 +36,34 @@ class SlackFormatter {
         return blocks
     }
 
+    public String formatMultipleNodes(SlackMessageData data) {
+        def blocks = [
+            getHeaderBlock(),
+            getProjectInfoBlock(false),
+            getDividerBlock()
+        ]
+
+        if (description_block != null) {
+            blocks.add(description_block)
+            blocks.add(getDividerBlock())
+        }
+
+        data.each { node ->
+            def content_block = [
+                "type": "section",
+                "text": 
+                [
+                    "type": "mrkdwn",
+                    "text": $node.value.allStages
+                ]
+            ]
+            blocks.add(content_block)
+            blocks.add(getDividerBlock())
+        }
+
+        return blocks
+    }
+
     String formatResult( String content_extra_infos = '' ) {
         def description_block = getOptionalDescriptionBlock()
 
@@ -121,7 +149,7 @@ class SlackFormatter {
         ]
     }
 
-    private getProjectInfoBlock() {
+    private getProjectInfoBlock(Bool include_node_name = true) {
         def helper = new JenkinsHelper()
 
         def branchName = helper.getBranchName()
@@ -129,7 +157,11 @@ class SlackFormatter {
         def nodeName = helper.getNodeName()
         def url = helper.getAbsoluteUrl()
 
-        String infos = "*Branch name:* ${branchName}\n*Build Number:* #${buildNumber}\n*Node name:* ${nodeName}"
+        String infos = "*Branch name:* ${branchName}\n*Build Number:* #${buildNumber}"
+
+        if ( include_node_name ) {
+            infos += "\n*Node name:* ${nodeName}"
+        }
 
         String author_name = this.config.AuthorName
         if ( author_name != null ) {

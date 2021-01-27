@@ -26,11 +26,17 @@ class SlackNotifier {
 
   public void notifyStart() {
     println("Slack Sender: Notify start")
-    def blocks = this.slackFormatter.format 'Build started...'
-    println("Blocks: $blocks")
-    this.slackResponse = this.slackSender.sendBlocks blocks
+    def helper = new JenkinsHelper()
+    def message_data = new SlackMessageData()
+    message_data.nodeName = helper.getNodeName()
+    messageData[message_data.nodeName:message_data]
 
-    messageData[this.slackResponse.ts:new SlackMessageData()]
+    if (this.slackResponse != null) {
+      return this.slackResponse
+    }
+    
+    def blocks = this.slackFormatter.format 'Build started...'
+    this.slackResponse = this.slackSender.sendBlocks blocks
 
     return this.slackResponse
   }
@@ -85,8 +91,9 @@ class SlackNotifier {
     if (_slackResponse == null) {
       _slackResponse = this.slackResponse
     }
+    def helper = new JenkinsHelper()
 
-    var data = messageData[_slackResponse.ts]
+    var data = messageData[helper.getNodeName()]
     data.currentStage = stage_name
 
     if ( data.allStages != null && data.allStages != '' ) {
@@ -96,12 +103,13 @@ class SlackNotifier {
       data.allStages += " ($duration) :heavy_check_mark: \n"
     } else {
       data.previousStageCompletedDate = new Date()
+      data.allStages += "*Node: * ${data.nodeName}"
     }
-    data.allStages += "* ${stage_name}"
+    data.allStages += "• ${stage_name}"
 
-    def blocks = this.slackFormatter.format data.allStages
+    def blocks = this.slackFormatter.formatMultipleNodes data
     this.slackSender.updateMessage( _slackResponse, blocks )
-    messageData[_slackResponse.ts] = data
+    messageData[data.nodeName] = data
   }
 
   public void uploadFileToMessage( filePath, String comment = '', _slackResponse = null ) {

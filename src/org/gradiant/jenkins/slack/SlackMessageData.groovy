@@ -6,4 +6,5 @@ class SlackMessageData {
   public String allStages = ""
   Date previousStageCompletedDate = null
   String currentStage = ""
+  String nodeName = ""
 }
