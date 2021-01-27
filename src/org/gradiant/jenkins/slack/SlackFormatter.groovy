@@ -50,24 +50,6 @@ class SlackFormatter {
             blocks.add(getDividerBlock())
         }
 
-        data.each { id, node ->
-            if (node.status != null) {
-                blocks.add(getResultContentBlock(node))
-            } else {
-                def content_block = [
-                    "type": "section",
-                    "text": 
-                    [
-                        "type": "mrkdwn",
-                        "text": node.allStages
-                    ]
-                ]
-                blocks.add(content_block)
-            }
-            
-            blocks.add(getDividerBlock())
-        }
-
         def finished = data.every { id, node ->
             node.status != null
         }
@@ -78,6 +60,20 @@ class SlackFormatter {
                 getDividerBlock(),
                 getResultChangesBlock()
             ])
+        } else {
+            data.each { id, node ->
+                def content_block = [
+                    "type": "section",
+                    "text": 
+                    [
+                        "type": "mrkdwn",
+                        "text": node.allStages
+                    ]
+                ]
+                blocks.add(content_block)
+                
+                blocks.add(getDividerBlock())
+            }
         }
 
         return blocks
