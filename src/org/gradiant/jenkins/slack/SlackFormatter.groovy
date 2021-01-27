@@ -56,6 +56,7 @@ class SlackFormatter {
 
         if (finished) {
             blocks.addAll([
+                getResultContentBlock(node),
                 getRelevantLinksBlock(),
                 getDividerBlock(),
                 getResultChangesBlock()
