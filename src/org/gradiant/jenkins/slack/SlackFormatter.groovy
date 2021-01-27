@@ -85,9 +85,10 @@ class SlackFormatter {
 
     public String formatError( Throwable error, data ) {
         def helper = new JenkinsHelper()
+        def node = data[helper.getNodeName()]
         String extra_infos = ''
 
-        String current_stage = SlackNotifier.instance.getCurrentStage()
+        String current_stage = node.currentStage
 
         if ( current_stage != "" ) {
             extra_infos += "\nwhile executing ${current_stage}"
@@ -95,7 +96,6 @@ class SlackFormatter {
 
         extra_infos += "\nError: `${error}`"
 
-        def node = data[helper.getNodeName()]
         node.errorInfo = extra_infos
         data[node.nodeName] = node
 
@@ -187,9 +187,10 @@ class SlackFormatter {
         return null
     }
 
-    private getResultContentBlock( String statusMessage, String content_extra_infos ) {
+    private getResultContentBlock( JenkinsStatus status, String content_extra_infos ) {
         def helper = new JenkinsHelper()
         def duration = helper.getDuration()
+        def statusMessage = status.getStatusMessage(config)
 
         def content = "${statusMessage} after ${duration}"
         content = content + content_extra_infos

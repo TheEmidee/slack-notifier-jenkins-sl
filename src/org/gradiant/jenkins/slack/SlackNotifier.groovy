@@ -9,6 +9,8 @@ class SlackNotifier {
   private config = null
   private SlackSender slackSender = null
   private SlackFormatter slackFormatter = null
+  // added this because slackResponse could be async, thus still calling notifyStart more than once.
+  private boolean isInitialized = false
   def messageData = [:]
 
   public void initialize( config, Script script ) {
@@ -31,10 +33,10 @@ class SlackNotifier {
     message_data.nodeName = helper.getNodeName()
     messageData.put(message_data.nodeName, message_data)
 
-    if (this.slackResponse != null) {
+    if (isInitialized == true) {
       return this.slackResponse
     }
-    
+    isInitialized = true    
     def blocks = this.slackFormatter.formatSimple 'Build started...'
     this.slackResponse = this.slackSender.sendBlocks blocks
 
@@ -97,9 +99,9 @@ class SlackNotifier {
       data.allStages += " ($duration) :heavy_check_mark: \n"
     } else {
       data.previousStageCompletedDate = new Date()
-      data.allStages += "*Node: * ${data.nodeName}"
+      data.allStages += "*Node name: * ${data.nodeName}\n"
     }
-    data.allStages += "• ${stage_name}"
+    data.allStages += "* ${stage_name}"
     messageData[data.nodeName] = data
 
     def blocks = this.slackFormatter.formatMultipleNodes messageData
