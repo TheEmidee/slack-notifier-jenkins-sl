@@ -40,3 +40,27 @@ String getStatusColor() {
 
   return colors.yellow()
 }
+
+public getStatusMessage(config) {
+  if (isBackToNormal()) {
+      return config.StatusMessages.BackToNormal
+  }
+
+  if (stillFailing()) {
+      return config.StatusMessages.StillFailing
+  }
+
+  if (hasFailed()) {
+      return config.StatusMessages.Failed
+  }
+
+  if (hasBeenSuccessful()) {
+      return config.StatusMessages.Successful
+  }
+
+  if (isUnstable()) {
+      return config.StatusMessages.Unstable
+  }
+
+  return ''
+}

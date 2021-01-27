@@ -19,7 +19,7 @@ class SlackNotifier {
   }
 
   public void notifyMessage( String custom_message ) {
-    def blocks = this.slackFormatter.format custom_message
+    def blocks = this.slackFormatter.formatSimple custom_message
     def result = this.slackSender.sendBlocks blocks
     return result
   }
@@ -29,20 +29,20 @@ class SlackNotifier {
     def helper = new JenkinsHelper()
     def message_data = new SlackMessageData()
     message_data.nodeName = helper.getNodeName()
-    messageData[message_data.nodeName:message_data]
+    messageData.put(message_data.nodeName, message_data)
 
     if (this.slackResponse != null) {
       return this.slackResponse
     }
     
-    def blocks = this.slackFormatter.format 'Build started...'
+    def blocks = this.slackFormatter.formatSimple 'Build started...'
     this.slackResponse = this.slackSender.sendBlocks blocks
 
     return this.slackResponse
   }
 
   public void notifyError( Throwable err) {
-    def blocks = this.slackFormatter.formatError err
+    def blocks = this.slackFormatter.formatError( err, messageData )
     
     this.script.echo "SlackNotifier - Update message with error"
     println("SlackNotifier - Update message with error")
@@ -51,6 +51,7 @@ class SlackNotifier {
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
+    // :TODO: only notify user when all builds are done?
     notifyUsers()
   }
 
@@ -60,8 +61,11 @@ class SlackNotifier {
       println("SlackNotifier - No notification will be send for SUCCESS result")
       return
     }
+    def helper = new JenkinsHelper()
+    def data = messageData[helper.getNodeName()]
+    data.status = new JenkinsStatus()
 
-    def blocks = this.slackFormatter.formatSuccess()
+    def blocks = this.slackFormatter.formatMultipleNodes messageData
     
     this.script.echo "SlackNotifier - Update message with success"
     println("SlackNotifier - Update message with success")
@@ -70,6 +74,7 @@ class SlackNotifier {
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
 
+    // :TODO: only notify user when all builds are done?
     notifyUsers()
 
     // if ( status.isBackToNormal() ) {
@@ -82,7 +87,7 @@ class SlackNotifier {
   public void notifyStage( String stage_name ) {
     def helper = new JenkinsHelper()
 
-    var data = messageData[helper.getNodeName()]
+    def data = messageData[helper.getNodeName()]
     data.currentStage = stage_name
 
     if ( data.allStages != null && data.allStages != '' ) {
@@ -95,10 +100,10 @@ class SlackNotifier {
       data.allStages += "*Node: * ${data.nodeName}"
     }
     data.allStages += "• ${stage_name}"
-
-    def blocks = this.slackFormatter.formatMultipleNodes data
-    this.slackSender.updateMessage( this.slackResponse, blocks )
     messageData[data.nodeName] = data
+
+    def blocks = this.slackFormatter.formatMultipleNodes messageData
+    this.slackSender.updateMessage( this.slackResponse, blocks )
   }
 
   public void uploadFileToMessage( filePath, String comment = '' ) {

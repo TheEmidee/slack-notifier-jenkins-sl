@@ -7,4 +7,6 @@ class SlackMessageData {
   Date previousStageCompletedDate = null
   String currentStage = ""
   String nodeName = ""
+  JenkinsStatus status = null
+  String errorInfo = ""
 }

@@ -8,7 +8,7 @@ class SlackFormatter {
         this.config = config
     }
 
-    public String format(String content = '') {
+    public String formatSimple(String content = '') {
         def description_block = getOptionalDescriptionBlock()
 
         def content_block = [
@@ -36,65 +36,55 @@ class SlackFormatter {
         return blocks
     }
 
-    public String formatMultipleNodes(SlackMessageData data) {
+    public String formatMultipleNodes(data) {
         def blocks = [
             getHeaderBlock(),
             getProjectInfoBlock(false),
             getDividerBlock()
         ]
 
+        def description_block = getOptionalDescriptionBlock()
+
         if (description_block != null) {
             blocks.add(description_block)
             blocks.add(getDividerBlock())
         }
 
-        data.each { node ->
-            def content_block = [
-                "type": "section",
-                "text": 
-                [
-                    "type": "mrkdwn",
-                    "text": $node.value.allStages
+        data.each { id, node ->
+            if (node.status != null) {
+                blocks.add(getResultContentBlock(node.status, node.errorInfo))
+            } else {
+                def content_block = [
+                    "type": "section",
+                    "text": 
+                    [
+                        "type": "mrkdwn",
+                        "text": node.allStages
+                    ]
                 ]
-            ]
-            blocks.add(content_block)
+                blocks.add(content_block)
+            }
+            
             blocks.add(getDividerBlock())
+        }
+
+        def finished = data.every { id, node ->
+            node.status != null
+        }
+
+        if (finished) {
+            blocks.addAll([
+                getRelevantLinksBlock(),
+                getDividerBlock(),
+                getResultChangesBlock()
+            ])
         }
 
         return blocks
     }
 
-    String formatResult( String content_extra_infos = '' ) {
-        def description_block = getOptionalDescriptionBlock()
-
-        def blocks = [
-            getHeaderBlock(),
-            getProjectInfoBlock(),
-            getDividerBlock()
-        ]
-        
-        if ( description_block != null ) {
-            blocks.add(description_block)
-            blocks.add(getDividerBlock())
-        }
-
-        blocks.addAll([
-            getResultContentBlock(content_extra_infos),
-            getDividerBlock(),
-            getRelevantLinksBlock(),
-            getDividerBlock(),
-            getResultChangesBlock()
-        ])
-
-        return blocks
-    }
-
-    public String formatSuccess() {
-        def blocks = formatResult()
-        return blocks
-    }
-
-    public String formatError( Throwable error ) {
+    public String formatError( Throwable error, data ) {
+        def helper = new JenkinsHelper()
         String extra_infos = ''
 
         String current_stage = SlackNotifier.instance.getCurrentStage()
@@ -105,34 +95,17 @@ class SlackFormatter {
 
         extra_infos += "\nError: `${error}`"
 
-        def blocks = formatResult extra_infos
+        def node = data[helper.getNodeName()]
+        node.errorInfo = extra_infos
+        data[node.nodeName] = node
+
+        def blocks = formatMultipleNodes data
         return blocks
     }
 
     private String getStatusMessage() {
         def status = new JenkinsStatus()
-
-        if (status.isBackToNormal()) {
-            return this.config.StatusMessages.BackToNormal
-        }
-
-        if (status.stillFailing()) {
-            return this.config.StatusMessages.StillFailing
-        }
-
-        if (status.hasFailed()) {
-            return this.config.StatusMessages.Failed
-        }
-
-        if (status.hasBeenSuccessful()) {
-            return this.config.StatusMessages.Successful
-        }
-
-        if (status.isUnstable()) {
-            return this.config.StatusMessages.Unstable
-        }
-
-        return ''
+        return status.getStatusMessage(config)
     }
 
     private getHeaderBlock() {
@@ -149,7 +122,7 @@ class SlackFormatter {
         ]
     }
 
-    private getProjectInfoBlock(Bool include_node_name = true) {
+    private getProjectInfoBlock(boolean include_node_name = true) {
         def helper = new JenkinsHelper()
 
         def branchName = helper.getBranchName()
@@ -214,9 +187,8 @@ class SlackFormatter {
         return null
     }
 
-    private getResultContentBlock( String content_extra_infos ) {
+    private getResultContentBlock( String statusMessage, String content_extra_infos ) {
         def helper = new JenkinsHelper()
-        def statusMessage = this.getStatusMessage()
         def duration = helper.getDuration()
 
         def content = "${statusMessage} after ${duration}"
