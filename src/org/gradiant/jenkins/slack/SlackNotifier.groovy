@@ -1,14 +1,17 @@
 package org.gradiant.jenkins.slack
 
+import groovy.time.*
+
 @Singleton
 class SlackNotifier {
   private slackResponse = null
   private Script script = null
-  private String allStages = ''
   private config = null
   private SlackSender slackSender = null
   private SlackFormatter slackFormatter = null
-  String currentStage = ""
+  // added this because slackResponse could be async, thus still calling notifyStart more than once.
+  private boolean isInitialized = false
+  def messageData = [:]
 
   public void initialize( config, Script script ) {
     this.config = config
@@ -18,48 +21,65 @@ class SlackNotifier {
   }
 
   public void notifyMessage( String custom_message ) {
-    def blocks = this.slackFormatter.format custom_message
+    def blocks = this.slackFormatter.formatSimple custom_message
     def result = this.slackSender.sendBlocks blocks
     return result
   }
 
   public void notifyStart() {
-    def blocks = this.slackFormatter.format 'Build started...'
-    this.slackResponse = this.slackSender.sendBlocks blocks
+    println("Slack Sender: Notify start")
+    def helper = new JenkinsHelper()
+    def message_data = new SlackMessageData()
+    message_data.nodeName = helper.getNodeName()
+    messageData.put(message_data.nodeName, message_data)
 
-    this.allStages = ''
+    if (isInitialized == true) {
+      return this.slackResponse
+    }
+    isInitialized = true    
+    def blocks = this.slackFormatter.formatSimple 'Build started...'
+    this.slackResponse = this.slackSender.sendBlocks blocks
 
     return this.slackResponse
   }
 
-  public void notifyError( Throwable err) {
-    def blocks = this.slackFormatter.formatError err
+  public void notifyError( Throwable err ) {
+
+    def blocks = this.slackFormatter.formatError( err, messageData )
     
     this.script.echo "SlackNotifier - Update message with error"
     println("SlackNotifier - Update message with error")
-    this.slackSender.updateMessage( slackResponse, blocks )
+    
+    this.slackSender.updateMessage( this.slackResponse, blocks )
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
+    // :TODO: only notify user when all builds are done?
     notifyUsers()
   }
 
   public void notifySuccess() {
+
     if(shouldNotNotifySuccess()) {
       this.script.echo "SlackNotifier - No notification will be send for SUCCESS result"
       println("SlackNotifier - No notification will be send for SUCCESS result")
       return
     }
+    def helper = new JenkinsHelper()
+    def data = messageData[helper.getNodeName()]
+    data.status = new JenkinsStatus()
+    messageData[data.nodeName] = data
 
-    def blocks = this.slackFormatter.formatSuccess()
+    def blocks = this.slackFormatter.formatMultipleNodes messageData
     
     this.script.echo "SlackNotifier - Update message with success"
     println("SlackNotifier - Update message with success")
-    this.slackSender.updateMessage( slackResponse, blocks )
+    this.slackSender.updateMessage( this.slackResponse, blocks )
 
     this.script.echo "SlackNotifier - Notify users"
     println("SlackNotifier - Notify users")
 
+    // :TODO: only notify user when all builds are done?
     notifyUsers()
 
     // if ( status.isBackToNormal() ) {
@@ -70,19 +90,29 @@ class SlackNotifier {
   }
 
   public void notifyStage( String stage_name ) {
-    this.currentStage = stage_name
+    def helper = new JenkinsHelper()
 
-    if ( this.allStages != null && this.allStages != '' ) {
-      this.allStages += " :heavy_check_mark: \n"
+    def data = messageData[helper.getNodeName()]
+    data.currentStage = stage_name
+
+    if ( data.allStages != null && data.allStages != '' ) {
+      def currentStageCompletedDate = new Date()
+      TimeDuration duration = TimeCategory.minus(currentStageCompletedDate, data.previousStageCompletedDate)
+      data.previousStageCompletedDate = currentStageCompletedDate
+      data.allStages += " ($duration) :heavy_check_mark: \n"
+    } else {
+      data.previousStageCompletedDate = new Date()
+      data.allStages += "*Node name: * ${data.nodeName}\n"
     }
-    this.allStages += "* ${stage_name}"
+    data.allStages += "* ${stage_name}"
+    messageData[data.nodeName] = data
 
-    def blocks = this.slackFormatter.format this.allStages
-    this.slackSender.updateMessage( slackResponse, blocks )
+    def blocks = this.slackFormatter.formatMultipleNodes messageData
+    this.slackSender.updateMessage( this.slackResponse, blocks )
   }
 
   public void uploadFileToMessage( filePath, String comment = '' ) {
-    slackUploadFile( channel: slackResponse.channelId + ":" + slackResponse.ts, filePath: filePath, initialComment: comment )
+    slackUploadFile( channel: this.slackResponse.channelId + ":" + this.slackResponse.ts, filePath: filePath, initialComment: comment )
   }
 
   public void notifyUsers() {
@@ -162,12 +192,12 @@ class SlackNotifier {
 
   private boolean shouldNotNotifySuccess() {
     def status = new JenkinsStatus()
-    return status.hasBeenSuccessful() && !this.config.NotifySuccess
+    return status.hasBeenSuccessful() && this.config.NotifySuccess != true
   }
 
   private boolean shouldNotSendDirectMessageOnSuccess() {
     def status = new JenkinsStatus()
-    return status.hasBeenSuccessful() && !this.config.NotifyUsersWithDirectMessageOnSuccess
+    return status.hasBeenSuccessful() && this.config.NotifyUsersWithDirectMessageOnSuccess != true
   }
 
   private List<String> getUsersToNotify() {

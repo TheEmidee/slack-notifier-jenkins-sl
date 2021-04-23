@@ -9,9 +9,6 @@ String getNodeName() {
 }
 
 String getDescription() {
-    if ( currentBuild.description == null ) {
-        return "No Description"
-    }
     return currentBuild.description
 }
 
@@ -83,7 +80,11 @@ String getGitHubPRNumber() {
 }
 
 String getGitHubPRUrl() {
-    return "https://github.com/FishingCactus/${getProjectName()}/pull/${getGitHubPRNumber()}"
+    def pr_number = getGitHubPRNumber()
+    if (pr_number != null && pr_number != "") {
+        return "https://github.com/FishingCactus/${getProjectName()}/pull/${getGitHubPRNumber()}"
+    }
+    return null;
 }
 
 String getProjectName() {
